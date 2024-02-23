@@ -17,13 +17,15 @@
     "prisma:reset": "npm run script:prisma:truncate && npm run prisma:seed",
     "prisma:setup": "npm run prisma:generate && npm run prisma:deploy",
     "script:prisma:truncate": "node ./scripts/truncate-db.js",
-    "script:generate:ssh": "node ./scripts/generate-rsa-keys.js",
     "script:generate:secret": "node ./scripts/generate-secret.js"
   },
   "prisma": {
     "seed": "node prisma/seed.js"
   },
   "dependencies": {
+    "@elysiajs/cors": "^0.8.0",
+    "@elysiajs/jwt": "^0.8.0",
+    "@elysiajs/static": "^0.8.1",
     "@prisma/client": "^5.10.2",
     "elysia": "latest"
   },

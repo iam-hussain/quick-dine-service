@@ -4,9 +4,11 @@ import { readFileSync, writeFileSync, existsSync } from "fs";
 import { EOL } from "os";
 import { resolve } from "path";
 
-const variables = ["OTP_SECRET="];
+const variables = ["SECRET="];
 
-const envPath = resolve(".env");
+console.log({ argv: process.argv });
+
+const envPath = resolve(process.argv[2] || ".env");
 
 function generateString() {
   return generateKeySync("hmac", { length: 512 }).export().toString("hex");
@@ -54,9 +56,9 @@ async function setEnvValues(input) {
 }
 
 async function generate() {
-  const OTP_SECRET = generateString();
+  const SECRET = generateString();
   await setEnvValues({
-    OTP_SECRET,
+    SECRET,
   });
 
   process.exit(0);
