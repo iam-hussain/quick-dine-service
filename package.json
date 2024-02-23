@@ -1,15 +1,35 @@
 {
   "name": "quick-dine-service",
   "version": "1.0.50",
+  "type": "module",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "bun run --watch src/index.ts"
+    "dev": "bun run --watch src/index.ts",
+    "build": "bun build src/index.ts",
+    "start": "NODE_ENV=production bun src/index.ts",
+    "test": "bun test",
+    "prisma:deploy": "bunx prisma migrate deploy",
+    "prisma:generate": "bunx prisma generate",
+    "prisma:migrate": "bunx prisma migrate dev",
+    "prisma:pull": "bunx prisma db pull",
+    "prisma:push": "bunx prisma db push",
+    "prisma:seed": "bunx prisma db seed",
+    "prisma:studio": "npx prisma studio",
+    "prisma:reset": "npm run script:prisma:truncate && npm run prisma:seed",
+    "prisma:setup": "npm run prisma:generate && npm run prisma:deploy",
+    "script:prisma:truncate": "node ./scripts/truncate-db.js",
+    "script:generate:ssh": "node ./scripts/generate-rsa-keys.js",
+    "script:generate:secret": "node ./scripts/generate-secret.js"
+  },
+  "prisma": {
+    "seed": "node prisma/seed.js"
   },
   "dependencies": {
+    "@prisma/client": "^5.10.2",
     "elysia": "latest"
   },
   "devDependencies": {
-    "bun-types": "latest"
+    "bun-types": "latest",
+    "prisma": "^5.10.2"
   },
   "module": "src/index.js"
 }
