@@ -87,33 +87,38 @@ async function main() {
           position: 1,
         },
       },
-      consumers: {
-        connect: [
-          {
-            businessAccountId: alice.id,
-            administer: true,
-          },
-          {
-            businessAccountId: bob.id,
-            administer: false,
-          },
-          {
-            businessAccountId: charlie.id,
-            administer: false,
-          },
-          {
-            businessAccountId: danny.id,
-            administer: false,
-          },
-          {
-            businessAccountId: elena.id,
-            administer: false,
-          },
-        ],
-      },
     },
   });
   const storeId = store.id;
+  await prisma.businessAccountsOnStores.createMany({
+    data: [
+      {
+        accountId: alice.id,
+        administer: true,
+        storeId,
+      },
+      {
+        accountId: bob.id,
+        administer: false,
+        storeId,
+      },
+      {
+        accountId: charlie.id,
+        administer: false,
+        storeId,
+      },
+      {
+        accountId: danny.id,
+        administer: false,
+        storeId,
+      },
+      {
+        accountId: elena.id,
+        administer: false,
+        storeId,
+      },
+    ],
+  });
 
   const image1 = await prisma.image.create({
     data: {
@@ -139,13 +144,13 @@ async function main() {
     data: {
       name: "Briyani",
       deck: "The Special Briyani pot",
-      type: "CATEGORY",
       position: 1,
       storeId,
       imageId: image1.id,
       products: {
         create: [
           {
+            type: "CATEGORY",
             assigned: true,
             product: {
               create: {
@@ -174,13 +179,13 @@ async function main() {
     data: {
       name: "Dessert",
       deck: "The Delicious Dessert",
-      type: "CATEGORY",
       position: 2,
       storeId,
       imageId: image2.id,
       products: {
         create: [
           {
+            type: "CATEGORY",
             assigned: true,
             product: {
               create: {
@@ -201,6 +206,7 @@ async function main() {
             },
           },
           {
+            type: "CATEGORY",
             assigned: true,
             product: {
               create: {
