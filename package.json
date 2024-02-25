@@ -27,7 +27,8 @@
     "@elysiajs/jwt": "^0.8.0",
     "@elysiajs/static": "^0.8.1",
     "@prisma/client": "^5.10.2",
-    "elysia": "latest"
+    "elysia": "latest",
+    "moment": "^2.30.1"
   },
   "devDependencies": {
     "bun-types": "latest",

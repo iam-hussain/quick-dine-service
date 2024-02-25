@@ -175,7 +175,7 @@ async function main() {
     },
   });
 
-  prisma.tag.create({
+  await prisma.tag.create({
     data: {
       name: "Dessert",
       deck: "The Delicious Dessert",
