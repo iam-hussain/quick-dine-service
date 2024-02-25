@@ -5,11 +5,19 @@ import { findManyProductsByStore } from "../models/product";
 export const transformProduct = (
   products: Awaited<ReturnType<typeof findManyProductsByStore>>
 ) => {
-  return products;
+  return products.map(({ tags, ...each }) => {
+    const formedTags = tags.map(({ tag, ...e }) => ({ ...tag, ...e }));
+    const category = formedTags.find((e) => e.type === "CATEGORY");
+    const tag = formedTags.filter((e) => e.type !== "CATEGORY");
+    return {
+      ...each,
+      category,
+      tags: tag,
+    };
+  });
 };
 
 export const transformStore = (store: Store) => {
-  console.log({ store });
   return {
     ...store,
     createdAt$: dateTimeFormat(store.createdAt),
