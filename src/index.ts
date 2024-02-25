@@ -16,11 +16,15 @@ const app = new Elysia()
     if (code === "NOT_FOUND") {
       set.status = 404;
     }
+    const errorMessage = error.message || "UNEXPECTED_ERROR";
 
     return responder({
       status: "error",
-      massage: code || "UNEXPECTED_ERROR",
-      data: { error: error.toString(), code },
+      massage: code || errorMessage,
+      data: {
+        error: error.toString(),
+        code,
+      },
     });
   })
   .onRequest((input) => {

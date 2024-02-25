@@ -1,36 +1,56 @@
 -- CreateEnum
-CREATE TYPE "ACCOUNT_TYPE" AS ENUM ('BUSINESS', 'CUSTOMER');
-
--- CreateEnum
-CREATE TYPE "CONNECTION_ROLE" AS ENUM ('ADMIN', 'MANAGER', 'BILLER', 'KITCHEN', 'OTHER');
+CREATE TYPE "ACCOUNT_TYPE" AS ENUM ('BUSINESS', 'PERSONAL');
 
 -- CreateEnum
 CREATE TYPE "IMAGE_TYPE" AS ENUM ('BASE64', 'PUBLIC', 'S3', 'PATH', 'URL', 'COLOR');
 
 -- CreateEnum
-CREATE TYPE "ORDER_TYPE" AS ENUM ('PICK_UP', 'TAKE_AWAY', 'DINING', 'PRE_DINING', 'DELIVERY', 'PLATFORM');
+CREATE TYPE "PRODUCT_TAG_TYPE" AS ENUM ('DEFAULT', 'CATEGORY');
 
 -- CreateEnum
-CREATE TYPE "LOG_TYPE" AS ENUM ('DEFAULT', 'ORDER_STATUS_UPDATE');
+CREATE TYPE "ORDER_TYPE" AS ENUM ('PRE_DINING', 'DINING', 'TAKE_AWAY', 'PICK_UP', 'DELIVERY', 'PLATFORM');
 
 -- CreateEnum
-CREATE TYPE "ORDER_ITEM_STATUS" AS ENUM ('PENDING', 'ACCEPTED', 'PREPARING', 'READY', 'OUT_FOR_DELIVERY', 'DELIVERED');
+CREATE TYPE "ORDER_STATUS" AS ENUM ('DRAFT', 'PLACED', 'ACCEPTED', 'PROGRESS', 'READY', 'OUT_FOR_DELIVERY', 'COMPLETED');
+
+-- CreateEnum
+CREATE TYPE "ITEM_STATUS" AS ENUM ('DRAFT', 'PLACED', 'ACCEPTED', 'PROGRESS', 'READY', 'COMPLETED');
 
 -- CreateEnum
 CREATE TYPE "BILL_PAID_BY" AS ENUM ('CASH', 'CREDIT_CARD', 'DEBIT_CARD', 'UPI', 'WALLET', 'DUE');
 
 -- CreateTable
-CREATE TABLE "Account" (
+CREATE TABLE "PersonalAccount" (
     "id" SERIAL NOT NULL,
     "firstName" TEXT NOT NULL,
     "lastName" TEXT,
-    "username" TEXT NOT NULL,
     "email" TEXT,
     "phone" TEXT,
-    "type" "ACCOUNT_TYPE" NOT NULL DEFAULT 'CUSTOMER',
+    "username" TEXT NOT NULL,
     "password" TEXT,
     "salt" TEXT,
-    "googleAuthId" TEXT,
+    "emailVerified" BOOLEAN NOT NULL DEFAULT false,
+    "phoneVerified" BOOLEAN NOT NULL DEFAULT false,
+    "passwordAdded" BOOLEAN NOT NULL DEFAULT false,
+    "createdStoreId" INTEGER,
+    "imageId" INTEGER,
+    "deleted" BOOLEAN NOT NULL DEFAULT false,
+    "deletedAt" TIMESTAMP(3),
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "PersonalAccount_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "BusinessAccount" (
+    "id" SERIAL NOT NULL,
+    "firstName" TEXT NOT NULL,
+    "lastName" TEXT,
+    "email" TEXT NOT NULL,
+    "phone" TEXT,
+    "password" TEXT NOT NULL,
+    "salt" TEXT NOT NULL,
     "emailVerified" BOOLEAN NOT NULL DEFAULT false,
     "phoneVerified" BOOLEAN NOT NULL DEFAULT false,
     "imageId" INTEGER,
@@ -39,14 +59,13 @@ CREATE TABLE "Account" (
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
-    CONSTRAINT "Account_pkey" PRIMARY KEY ("id")
+    CONSTRAINT "BusinessAccount_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
 CREATE TABLE "Connection" (
     "id" SERIAL NOT NULL,
-    "role" "CONNECTION_ROLE" NOT NULL DEFAULT 'OTHER',
-    "passcode" TEXT DEFAULT '000000',
+    "access" JSONB NOT NULL DEFAULT '{}',
     "accountId" INTEGER NOT NULL,
     "storeId" INTEGER NOT NULL,
     "deleted" BOOLEAN NOT NULL DEFAULT false,
@@ -66,6 +85,7 @@ CREATE TABLE "Store" (
     "email" TEXT,
     "phone" TEXT,
     "tables" INTEGER NOT NULL DEFAULT 0,
+    "additional" JSONB NOT NULL DEFAULT '{}',
     "addressId" INTEGER NOT NULL,
     "deleted" BOOLEAN NOT NULL DEFAULT false,
     "deletedAt" TIMESTAMP(3),
@@ -89,6 +109,7 @@ CREATE TABLE "Address" (
     "deletedAt" TIMESTAMP(3),
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
+    "personalAccountId" INTEGER,
 
     CONSTRAINT "Address_pkey" PRIMARY KEY ("id")
 );
@@ -102,6 +123,7 @@ CREATE TABLE "Image" (
     "type" "IMAGE_TYPE" NOT NULL DEFAULT 'PUBLIC',
     "position" INTEGER NOT NULL DEFAULT 1,
     "productId" INTEGER,
+    "accountId" INTEGER,
     "deleted" BOOLEAN NOT NULL DEFAULT false,
     "deletedAt" TIMESTAMP(3),
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -111,10 +133,12 @@ CREATE TABLE "Image" (
 );
 
 -- CreateTable
-CREATE TABLE "Category" (
+CREATE TABLE "ProductTag" (
     "id" SERIAL NOT NULL,
     "name" TEXT NOT NULL,
     "deck" TEXT,
+    "position" INTEGER NOT NULL DEFAULT 0,
+    "type" "PRODUCT_TAG_TYPE" NOT NULL DEFAULT 'DEFAULT',
     "imageId" INTEGER,
     "storeId" INTEGER NOT NULL,
     "deleted" BOOLEAN NOT NULL DEFAULT false,
@@ -122,7 +146,7 @@ CREATE TABLE "Category" (
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
-    CONSTRAINT "Category_pkey" PRIMARY KEY ("id")
+    CONSTRAINT "ProductTag_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -132,7 +156,6 @@ CREATE TABLE "Product" (
     "deck" TEXT,
     "price" DOUBLE PRECISION NOT NULL DEFAULT 0,
     "outOfStock" BOOLEAN NOT NULL DEFAULT false,
-    "categoryId" INTEGER NOT NULL,
     "storeId" INTEGER NOT NULL,
     "deleted" BOOLEAN NOT NULL DEFAULT false,
     "deletedAt" TIMESTAMP(3),
@@ -146,8 +169,9 @@ CREATE TABLE "Product" (
 CREATE TABLE "Order" (
     "id" SERIAL NOT NULL,
     "type" "ORDER_TYPE" NOT NULL DEFAULT 'TAKE_AWAY',
-    "status" "ORDER_ITEM_STATUS" NOT NULL DEFAULT 'PENDING',
+    "status" "ORDER_STATUS" NOT NULL DEFAULT 'DRAFT',
     "table" INTEGER NOT NULL DEFAULT 0,
+    "notes" TEXT,
     "deleted" BOOLEAN NOT NULL DEFAULT false,
     "deletedAt" TIMESTAMP(3),
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -157,16 +181,17 @@ CREATE TABLE "Order" (
 );
 
 -- CreateTable
-CREATE TABLE "ActivityLog" (
+CREATE TABLE "Log" (
     "id" SERIAL NOT NULL,
     "content" JSONB NOT NULL DEFAULT '{}',
-    "type" "LOG_TYPE" NOT NULL DEFAULT 'DEFAULT',
+    "type" TEXT NOT NULL DEFAULT 'UNKNOWN',
     "orderId" INTEGER,
     "accountId" INTEGER,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
+    "personalAccountId" INTEGER,
 
-    CONSTRAINT "ActivityLog_pkey" PRIMARY KEY ("id")
+    CONSTRAINT "Log_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -179,7 +204,9 @@ CREATE TABLE "Item" (
     "total" DOUBLE PRECISION NOT NULL DEFAULT 0,
     "position" INTEGER NOT NULL DEFAULT 0,
     "interval" INTEGER NOT NULL DEFAULT 0,
-    "status" "ORDER_ITEM_STATUS" NOT NULL DEFAULT 'PENDING',
+    "status" "ITEM_STATUS" NOT NULL DEFAULT 'DRAFT',
+    "notes" TEXT,
+    "startAfter" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "productId" INTEGER NOT NULL,
     "orderId" INTEGER NOT NULL,
     "billId" INTEGER,
@@ -217,14 +244,20 @@ CREATE TABLE "Bill" (
     CONSTRAINT "Bill_pkey" PRIMARY KEY ("id")
 );
 
--- CreateIndex
-CREATE UNIQUE INDEX "Account_imageId_key" ON "Account"("imageId");
+-- CreateTable
+CREATE TABLE "_ProductToProductTag" (
+    "A" INTEGER NOT NULL,
+    "B" INTEGER NOT NULL
+);
 
 -- CreateIndex
-CREATE UNIQUE INDEX "Account_username_type_key" ON "Account"("username", "type");
+CREATE UNIQUE INDEX "PersonalAccount_imageId_key" ON "PersonalAccount"("imageId");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "Account_email_type_key" ON "Account"("email", "type");
+CREATE UNIQUE INDEX "BusinessAccount_email_key" ON "BusinessAccount"("email");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "BusinessAccount_imageId_key" ON "BusinessAccount"("imageId");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Connection_accountId_storeId_key" ON "Connection"("accountId", "storeId");
@@ -232,11 +265,23 @@ CREATE UNIQUE INDEX "Connection_accountId_storeId_key" ON "Connection"("accountI
 -- CreateIndex
 CREATE UNIQUE INDEX "Store_slug_key" ON "Store"("slug");
 
--- AddForeignKey
-ALTER TABLE "Account" ADD CONSTRAINT "Account_imageId_fkey" FOREIGN KEY ("imageId") REFERENCES "Image"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+-- CreateIndex
+CREATE UNIQUE INDEX "_ProductToProductTag_AB_unique" ON "_ProductToProductTag"("A", "B");
+
+-- CreateIndex
+CREATE INDEX "_ProductToProductTag_B_index" ON "_ProductToProductTag"("B");
 
 -- AddForeignKey
-ALTER TABLE "Connection" ADD CONSTRAINT "Connection_accountId_fkey" FOREIGN KEY ("accountId") REFERENCES "Account"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "PersonalAccount" ADD CONSTRAINT "PersonalAccount_createdStoreId_fkey" FOREIGN KEY ("createdStoreId") REFERENCES "Store"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "PersonalAccount" ADD CONSTRAINT "PersonalAccount_imageId_fkey" FOREIGN KEY ("imageId") REFERENCES "Image"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "BusinessAccount" ADD CONSTRAINT "BusinessAccount_imageId_fkey" FOREIGN KEY ("imageId") REFERENCES "Image"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Connection" ADD CONSTRAINT "Connection_accountId_fkey" FOREIGN KEY ("accountId") REFERENCES "BusinessAccount"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Connection" ADD CONSTRAINT "Connection_storeId_fkey" FOREIGN KEY ("storeId") REFERENCES "Store"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
@@ -245,28 +290,31 @@ ALTER TABLE "Connection" ADD CONSTRAINT "Connection_storeId_fkey" FOREIGN KEY ("
 ALTER TABLE "Store" ADD CONSTRAINT "Store_addressId_fkey" FOREIGN KEY ("addressId") REFERENCES "Address"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Address" ADD CONSTRAINT "Address_accountId_fkey" FOREIGN KEY ("accountId") REFERENCES "Account"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+ALTER TABLE "Address" ADD CONSTRAINT "Address_accountId_fkey" FOREIGN KEY ("accountId") REFERENCES "BusinessAccount"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Address" ADD CONSTRAINT "Address_personalAccountId_fkey" FOREIGN KEY ("personalAccountId") REFERENCES "PersonalAccount"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Image" ADD CONSTRAINT "Image_productId_fkey" FOREIGN KEY ("productId") REFERENCES "Product"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Category" ADD CONSTRAINT "Category_imageId_fkey" FOREIGN KEY ("imageId") REFERENCES "Image"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+ALTER TABLE "ProductTag" ADD CONSTRAINT "ProductTag_imageId_fkey" FOREIGN KEY ("imageId") REFERENCES "Image"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Category" ADD CONSTRAINT "Category_storeId_fkey" FOREIGN KEY ("storeId") REFERENCES "Store"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "Product" ADD CONSTRAINT "Product_categoryId_fkey" FOREIGN KEY ("categoryId") REFERENCES "Category"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "ProductTag" ADD CONSTRAINT "ProductTag_storeId_fkey" FOREIGN KEY ("storeId") REFERENCES "Store"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Product" ADD CONSTRAINT "Product_storeId_fkey" FOREIGN KEY ("storeId") REFERENCES "Store"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "ActivityLog" ADD CONSTRAINT "ActivityLog_orderId_fkey" FOREIGN KEY ("orderId") REFERENCES "Order"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+ALTER TABLE "Log" ADD CONSTRAINT "Log_orderId_fkey" FOREIGN KEY ("orderId") REFERENCES "Order"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "ActivityLog" ADD CONSTRAINT "ActivityLog_accountId_fkey" FOREIGN KEY ("accountId") REFERENCES "Account"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+ALTER TABLE "Log" ADD CONSTRAINT "Log_accountId_fkey" FOREIGN KEY ("accountId") REFERENCES "BusinessAccount"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Log" ADD CONSTRAINT "Log_personalAccountId_fkey" FOREIGN KEY ("personalAccountId") REFERENCES "PersonalAccount"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Item" ADD CONSTRAINT "Item_productId_fkey" FOREIGN KEY ("productId") REFERENCES "Product"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
@@ -285,3 +333,9 @@ ALTER TABLE "Bill" ADD CONSTRAINT "Bill_orderId_fkey" FOREIGN KEY ("orderId") RE
 
 -- AddForeignKey
 ALTER TABLE "Bill" ADD CONSTRAINT "Bill_storeId_fkey" FOREIGN KEY ("storeId") REFERENCES "Store"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "_ProductToProductTag" ADD CONSTRAINT "_ProductToProductTag_A_fkey" FOREIGN KEY ("A") REFERENCES "Product"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "_ProductToProductTag" ADD CONSTRAINT "_ProductToProductTag_B_fkey" FOREIGN KEY ("B") REFERENCES "ProductTag"("id") ON DELETE CASCADE ON UPDATE CASCADE;

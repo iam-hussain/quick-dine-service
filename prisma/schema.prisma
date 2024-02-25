@@ -10,125 +10,142 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-enum ACCOUNT_TYPE {
-  BUSINESS
-  CUSTOMER
-}
-
-model Account {
-  id            Int          @id @default(autoincrement())
+model BusinessAccount {
+  id            Int                        @id @default(autoincrement())
   firstName     String
   lastName      String?
-  username      String       @default(uuid())
-  email         String?
+  email         String                     @unique
+  username      String                     @unique @default(uuid())
   phone         String?
-  type          ACCOUNT_TYPE @default(CUSTOMER)
-  password      String?
-  salt          String?
-  googleAuthId  String?
-  emailVerified Boolean      @default(false)
-  phoneVerified Boolean      @default(false)
-
-  image        Image?        @relation(fields: [imageId], references: [id])
-  imageId      Int?          @unique
-  addresses    Address[]
-  connections  Connection[]
-  activityLogs ActivityLog[]
-
-  deleted   Boolean   @default(false)
-  deletedAt DateTime?
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-
-  @@unique([username, type])
-  @@unique([email, type])
+  password      String
+  salt          String
+  emailVerified Boolean                    @default(false)
+  phoneVerified Boolean                    @default(false)
+  image         Image?                     @relation(fields: [imageId], references: [id])
+  imageId       Int?                       @unique
+  addresses     Address[]
+  logs          Log[]
+  stores        BusinessAccountsOnStores[]
+  deleted       Boolean                    @default(false)
+  deletedAt     DateTime?
+  createdAt     DateTime                   @default(now())
+  updatedAt     DateTime                   @updatedAt
 }
 
-model Connection {
-  id       Int             @id @default(autoincrement())
-  role     CONNECTION_ROLE @default(OTHER)
-  passcode String?         @default("000000")
+model BusinessAccountsOnStores {
+  administer Boolean         @default(false)
+  access     Json            @default("{}")
+  account    BusinessAccount @relation(fields: [accountId], references: [id])
+  accountId  Int
+  store      Store           @relation(fields: [storeId], references: [id])
+  storeId    Int
+  assigned   Boolean         @default(true)
+  assignedAt DateTime        @default(now())
+  deleted    Boolean         @default(false)
+  deletedAt  DateTime?
+  createdAt  DateTime        @default(now())
+  updatedAt  DateTime        @updatedAt
 
-  account   Account @relation(fields: [accountId], references: [id])
-  accountId Int
-  store     Store   @relation(fields: [storeId], references: [id])
-  storeId   Int
-
-  deleted   Boolean   @default(false)
-  deletedAt DateTime?
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-
-  @@unique([accountId, storeId])
-}
-
-enum CONNECTION_ROLE {
-  ADMIN
-  MANAGER
-  BILLER
-  KITCHEN
-  OTHER
+  @@id([storeId, accountId])
 }
 
 model Store {
-  id     Int     @id @default(autoincrement())
-  name   String
-  deck   String?
-  slug   String  @unique
-  email  String?
-  phone  String?
-  tables Int     @default(0)
+  id         Int                        @id @default(autoincrement())
+  name       String
+  deck       String?
+  slug       String                     @unique
+  email      String?
+  phone      String?
+  tables     Int                        @default(0)
+  additional Json                       @default("{}")
+  addresses  Address                    @relation(fields: [addressId], references: [id])
+  addressId  Int
+  tags       Tag[]
+  products   Product[]
+  items      Item[]
+  bills      Bill[]
+  consumers  BusinessAccountsOnStores[]
+  customers  PersonalAccountsOnStores[]
+  deleted    Boolean                    @default(false)
+  deletedAt  DateTime?
+  createdAt  DateTime                   @default(now())
+  updatedAt  DateTime                   @updatedAt
+}
 
-  addresses   Address      @relation(fields: [addressId], references: [id])
-  addressId   Int
-  categories  Category[]
-  products    Product[]
-  connections Connection[]
-  items       Item[]
-  bills       Bill[]
+model PersonalAccountsOnStores {
+  account    PersonalAccount @relation(fields: [accountId], references: [id])
+  accountId  Int
+  store      Store           @relation(fields: [storeId], references: [id])
+  storeId    Int
+  originated Boolean         @default(false)
+  assigned   Boolean         @default(true)
+  assignedAt DateTime        @default(now())
+  deleted    Boolean         @default(false)
+  deletedAt  DateTime?
+  createdAt  DateTime        @default(now())
+  updatedAt  DateTime        @updatedAt
 
-  deleted   Boolean   @default(false)
-  deletedAt DateTime?
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
+  @@id([storeId, accountId])
+}
+
+model PersonalAccount {
+  id            Int                        @id @default(autoincrement())
+  firstName     String
+  lastName      String?
+  email         String?
+  phone         String?
+  username      String                     @unique @default(uuid())
+  password      String?
+  salt          String?
+  emailVerified Boolean                    @default(false)
+  phoneVerified Boolean                    @default(false)
+  passwordAdded Boolean                    @default(false)
+  image         Image?                     @relation(fields: [imageId], references: [id])
+  imageId       Int?                       @unique
+  addresses     Address[]
+  logs          Log[]
+  stores        PersonalAccountsOnStores[]
+  deleted       Boolean                    @default(false)
+  deletedAt     DateTime?
+  createdAt     DateTime                   @default(now())
+  updatedAt     DateTime                   @updatedAt
 }
 
 model Address {
-  id       Int     @id @default(autoincrement())
-  line1    String
-  line2    String?
-  state    String
-  county   String
-  pincode  String
-  position Int     @default(1)
-
-  account   Account? @relation(fields: [accountId], references: [id])
-  accountId Int?
-  stores    Store[]
-
-  deleted   Boolean   @default(false)
-  deletedAt DateTime?
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
+  id                Int              @id @default(autoincrement())
+  line1             String
+  line2             String?
+  state             String
+  county            String
+  pincode           String
+  position          Int              @default(1)
+  personalAccount   PersonalAccount? @relation(fields: [personalAccountId], references: [id])
+  personalAccountId Int?
+  businessAccount   BusinessAccount? @relation(fields: [businessAccountId], references: [id])
+  businessAccountId Int?
+  stores            Store[]
+  deleted           Boolean          @default(false)
+  deletedAt         DateTime?
+  createdAt         DateTime         @default(now())
+  updatedAt         DateTime         @updatedAt
 }
 
 model Image {
-  id       Int        @id @default(autoincrement())
-  caption  String?
-  altText  String?
-  content  String
-  type     IMAGE_TYPE @default(PUBLIC)
-  position Int        @default(1)
-
-  categories Category[]
-  product    Product?   @relation(fields: [productId], references: [id])
-  productId  Int?
-  account    Account?
-
-  deleted   Boolean   @default(false)
-  deletedAt DateTime?
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
+  id               Int              @id @default(autoincrement())
+  caption          String?
+  altText          String?
+  content          String
+  type             IMAGE_TYPE       @default(PUBLIC)
+  position         Int              @default(1)
+  product          Product?         @relation(fields: [productId], references: [id])
+  productId        Int?
+  businessAccount  BusinessAccount?
+  personalAccounts PersonalAccount?
+  deleted          Boolean          @default(false)
+  deletedAt        DateTime?
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
+  tags             Tag[]
 }
 
 enum IMAGE_TYPE {
@@ -140,36 +157,51 @@ enum IMAGE_TYPE {
   COLOR
 }
 
-model Category {
-  id   Int     @id @default(autoincrement())
-  name String
-  deck String?
-
-  image    Image?    @relation(fields: [imageId], references: [id])
-  imageId  Int?
-  store    Store     @relation(fields: [storeId], references: [id])
-  storeId  Int
-  products Product[]
-
-  deleted   Boolean   @default(false)
+model Tag {
+  id        Int              @id @default(autoincrement())
+  name      String
+  deck      String?
+  position  Int              @default(0)
+  image     Image?           @relation(fields: [imageId], references: [id])
+  imageId   Int?
+  store     Store            @relation(fields: [storeId], references: [id])
+  storeId   Int
+  products  ProductsOnTags[]
+  deleted   Boolean          @default(false)
   deletedAt DateTime?
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
+  createdAt DateTime         @default(now())
+  updatedAt DateTime         @updatedAt
+}
+
+enum PRODUCT_TAG_TYPE {
+  DEFAULT
+  CATEGORY
+}
+
+model ProductsOnTags {
+  tag        Tag              @relation(fields: [tagId], references: [id])
+  tagId      Int
+  product    Product          @relation(fields: [productId], references: [id])
+  productId  Int
+  type       PRODUCT_TAG_TYPE @default(DEFAULT)
+  assigned   Boolean          @default(true)
+  assignedAt DateTime         @default(now())
+
+  @@id([tagId, productId])
 }
 
 model Product {
-  id         Int     @id @default(autoincrement())
+  id         Int              @id @default(autoincrement())
   name       String
   deck       String?
-  price      Float   @default(0)
-  outOfStock Boolean @default(false)
+  price      Float            @default(0)
+  outOfStock Boolean          @default(false)
+  tags       ProductsOnTags[]
 
-  image      Image[]
-  category   Category @relation(fields: [categoryId], references: [id])
-  categoryId Int
-  store      Store    @relation(fields: [storeId], references: [id])
-  storeId    Int
-  items      Item[]
+  image   Image[]
+  store   Store   @relation(fields: [storeId], references: [id])
+  storeId Int
+  items   Item[]
 
   deleted   Boolean   @default(false)
   deletedAt DateTime?
@@ -178,14 +210,15 @@ model Product {
 }
 
 model Order {
-  id     Int               @id @default(autoincrement())
-  type   ORDER_TYPE        @default(TAKE_AWAY)
-  status ORDER_ITEM_STATUS @default(PENDING)
-  table  Int               @default(0)
+  id     Int          @id @default(autoincrement())
+  type   ORDER_TYPE   @default(TAKE_AWAY)
+  status ORDER_STATUS @default(DRAFT)
+  table  Int          @default(0)
+  notes  String?
 
-  items        Item[]
-  bills        Bill[]
-  activityLogs ActivityLog[]
+  items Item[]
+  bills Bill[]
+  logs  Log[]
 
   deleted   Boolean   @default(false)
   deletedAt DateTime?
@@ -194,43 +227,52 @@ model Order {
 }
 
 enum ORDER_TYPE {
-  PICK_UP
-  TAKE_AWAY
-  DINING
   PRE_DINING
+  DINING
+  TAKE_AWAY
+  PICK_UP
   DELIVERY
   PLATFORM
 }
 
-model ActivityLog {
+enum ORDER_STATUS {
+  DRAFT
+  PLACED
+  ACCEPTED
+  PROGRESS
+  READY
+  OUT_FOR_DELIVERY
+  COMPLETED
+}
+
+model Log {
   id      Int  @id @default(autoincrement())
   content Json @default("{}")
 
-  type      LOG_TYPE @default(DEFAULT)
-  order     Order?   @relation(fields: [orderId], references: [id])
+  type      String           @default("UNKNOWN")
+  order     Order?           @relation(fields: [orderId], references: [id])
   orderId   Int?
-  account   Account? @relation(fields: [accountId], references: [id])
+  account   BusinessAccount? @relation(fields: [accountId], references: [id])
   accountId Int?
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
-
-enum LOG_TYPE {
-  DEFAULT
-  ORDER_STATUS_UPDATE
+  createdAt         DateTime         @default(now())
+  updatedAt         DateTime         @updatedAt
+  PersonalAccount   PersonalAccount? @relation(fields: [personalAccountId], references: [id])
+  personalAccountId Int?
 }
 
 model Item {
-  id       Int               @id @default(autoincrement())
-  title    String?
-  note     String?
-  price    Float             @default(0)
-  quantity Int               @default(0)
-  total    Float             @default(0)
-  position Int               @default(0)
-  interval Int               @default(0)
-  status   ORDER_ITEM_STATUS @default(PENDING)
+  id         Int         @id @default(autoincrement())
+  title      String?
+  note       String?
+  price      Float       @default(0)
+  quantity   Int         @default(0)
+  total      Float       @default(0)
+  position   Int         @default(0)
+  interval   Int         @default(0)
+  status     ITEM_STATUS @default(DRAFT)
+  notes      String?
+  startAfter DateTime    @default(now())
 
   product   Product @relation(fields: [productId], references: [id])
   productId Int
@@ -247,13 +289,13 @@ model Item {
   updatedAt DateTime  @updatedAt
 }
 
-enum ORDER_ITEM_STATUS {
-  PENDING
+enum ITEM_STATUS {
+  DRAFT
+  PLACED
   ACCEPTED
-  PREPARING
+  PROGRESS
   READY
-  OUT_FOR_DELIVERY
-  DELIVERED
+  COMPLETED
 }
 
 model Bill {

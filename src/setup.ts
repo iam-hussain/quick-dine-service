@@ -12,7 +12,7 @@ export default new Elysia({ name: "setup" })
       exp: "1d",
     })
   )
-  .derive(async ({ jwt, headers, set }) => {
+  .derive(async ({ jwt, headers }) => {
     const authorization = headers["authorization"];
     const token = authorization?.startsWith("Bearer ")
       ? authorization.slice(7)
