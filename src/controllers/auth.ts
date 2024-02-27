@@ -43,7 +43,7 @@ export default new Elysia({ prefix: "/auth" }).use(setup).post(
 
     return {
       access_token: await jwt.sign(tokenData),
-      includesStore: stores.length === 1,
+      includes_store: stores.length === 1,
     };
   },
   {
