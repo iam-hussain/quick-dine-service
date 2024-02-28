@@ -1,0 +1,37 @@
+name: Build and Deployment
+
+on: [push]
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+      - name: Use Node.js
+        uses: oven-sh/setup-bun@v1
+        with:
+          bun-version: latest
+      - run: bun i
+      - run: bun run build
+
+  deployment:
+    name: Deployment
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Connect SSH and Run Scripts
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          key: ${{ secrets.KEY }}
+          script: |
+            cd /root/projects/quick-dine-service
+            git checkout .
+            git pull
+            bun i
+            bun run setup
+            pm2 restart quickdine-service
