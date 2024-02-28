@@ -33,5 +33,5 @@ jobs:
             git checkout .
             git pull
             /root/.bun/bin/bun i
-            /root/.bun/bin/bun run setup
+            /root/.bun/bin/bun run prisma:setup
             pm2 restart quickdine-service
