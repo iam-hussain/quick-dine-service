@@ -35,7 +35,7 @@ const app = new Elysia()
   .all("*", () => {
     throw new NotFoundError();
   })
-  .listen(4000);
+  .listen(process.env.PORT || 4000);
 
 console.log(
   `🦊 Elysia is running at ${app.server?.hostname}:${app.server?.port}`
