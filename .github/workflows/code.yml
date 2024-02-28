@@ -29,9 +29,10 @@ jobs:
           username: ${{ secrets.USERNAME }}
           key: ${{ secrets.KEY }}
           script: |
+            source ~/.bashrc
             cd /root/projects/quick-dine-service
             git checkout .
             git pull
-            /root/.bun/bin/bun i
-            /root/.bun/bin/bun run prisma:setup
+            bun i
+            bun run setup
             pm2 restart quickdine-service
