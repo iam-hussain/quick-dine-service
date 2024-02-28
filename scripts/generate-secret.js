@@ -1,4 +1,3 @@
-/* eslint-disable no-undef */
 import { generateKeySync } from "crypto";
 import { readFileSync, writeFileSync, existsSync } from "fs";
 import { EOL } from "os";
