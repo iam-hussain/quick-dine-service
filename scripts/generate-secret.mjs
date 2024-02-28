@@ -5,8 +5,6 @@ import { resolve } from "path";
 
 const variables = ["SECRET="];
 
-console.log({ argv: process.argv });
-
 const envPath = resolve(process.argv[2] || ".env");
 
 function generateString() {
