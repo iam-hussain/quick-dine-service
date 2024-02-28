@@ -35,5 +35,5 @@ jobs:
             git checkout .
             git pull
             bun i
-            bun run setup
+            bun run prisma:setup
             pm2 restart quickdine-service
