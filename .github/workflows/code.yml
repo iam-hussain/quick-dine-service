@@ -29,7 +29,8 @@ jobs:
           username: ${{ secrets.USERNAME }}
           key: ${{ secrets.KEY }}
           script: |
-            source ~/.bashrc
+            export BUN_INSTALL="$HOME/.bun"
+            export PATH=$BUN_INSTALL/bin:$PATH
             cd /root/projects/quick-dine-service
             git checkout .
             git pull
