@@ -7,13 +7,7 @@ export default new Elysia({ prefix: "/api" })
   .mapResponse(({ response, set }) => {
     const isJson = typeof response === "object";
 
-    const text = isJson
-      ? JSON.stringify(
-          responder({
-            data: response,
-          })
-        )
-      : response?.toString() ?? "";
+    const text = isJson ? JSON.stringify(response) : response?.toString() ?? "";
 
     set.headers["Content-Encoding"] = "gzip";
 

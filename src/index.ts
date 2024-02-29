@@ -18,20 +18,16 @@ const app = new Elysia()
     }
     const errorMessage = error.message || "UNEXPECTED_ERROR";
 
-    return responder({
-      status: "error",
+    return {
       massage: code || errorMessage,
-      data: {
-        error: error.toString(),
-        code,
-      },
-    });
+      error: error.toString(),
+    };
   })
   .onRequest((input) => {
     console.log({ input });
   })
-  .get("/", () => responder({ massage: "QuickDine backend service" }))
-  .get("/ping", () => responder({ massage: "pong" }))
+  .get("/", () => ({ massage: "QuickDine backend service" }))
+  .get("/ping", () => ({ massage: "pong" }))
   .all("*", () => {
     throw new NotFoundError();
   })
