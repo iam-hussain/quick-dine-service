@@ -17,9 +17,14 @@ export const shouldBeLoggedInWithStore = ({ token, set }: CustomHandler) => {
     set.status = "Unauthorized";
     throw new CustomError("TOKEN_NOT_FOUND");
   }
-  if (!token.decoded || !token.decoded.store || !token.decoded.username) {
+  if (!token.decoded || !token.decoded.username) {
     set.status = "Unauthorized";
     throw new CustomError("INVALID_TOKEN");
+  }
+
+  if (!token.decoded.store) {
+    set.status = "Unauthorized";
+    throw new CustomError("INVALID_STORE_TOKEN");
   }
 };
 
