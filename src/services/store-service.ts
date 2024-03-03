@@ -1,6 +1,6 @@
-import db from "../providers/db";
+import db from "../providers/database";
 
-export const findManyStoreByOwnerId = (accountId: number) => {
+const findByBusAccount = (accountId: number) => {
   return db.store.findMany({
     where: {
       consumers: {
@@ -12,7 +12,7 @@ export const findManyStoreByOwnerId = (accountId: number) => {
   });
 };
 
-export const findStoreBySlugOwnerId = (slug: string, accountId: number) => {
+export const findBySlugAndBusAccount = (slug: string, accountId: number) => {
   return db.store.findUnique({
     where: {
       slug,
@@ -23,4 +23,9 @@ export const findStoreBySlugOwnerId = (slug: string, accountId: number) => {
       },
     },
   });
+};
+
+export default {
+  findByBusAccount,
+  findBySlugAndBusAccount,
 };

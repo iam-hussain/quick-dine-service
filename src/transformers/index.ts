@@ -1,6 +1,6 @@
 import { Product, ProductsOnTags, Store, Tag } from "@prisma/client";
 import { dateTimeFormat } from "../libs/date";
-import { findManyProductsByStore } from "../models/product";
+import { findManyProductsByStore } from "../services/product-service";
 
 export const transformProduct = (
   products: Awaited<ReturnType<typeof findManyProductsByStore>>

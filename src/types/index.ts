@@ -1,3 +1,5 @@
+import { JWTPayloadSpec } from "@elysiajs/jwt";
+
 export declare const StatusMap: {
   readonly Continue: 100;
   readonly "Switching Protocols": 101;
@@ -62,12 +64,31 @@ export declare const StatusMap: {
 };
 export type HTTPStatusName = keyof typeof StatusMap;
 
-export type CustomHandler = {
+export type JWT_OBJECT = {
+  username: string;
+  store?: string;
+  type: "BUSINESS" | "PERSONAL";
+};
+
+export type HandlerProps = {
+  headers: Record<string, string | undefined>;
   token: {
     value: string | null;
-    decoded: any;
+    decoded: false | JWT_OBJECT;
+    hasToken: Boolean;
+    tokenType: "BUSINESS" | "PERSONAL" | "";
+    isBusinessUser: Boolean;
+    hasStore: Boolean;
   };
   set: {
     status?: number | HTTPStatusName;
+  };
+  jwt: {
+    readonly sign: (
+      morePayload: Record<string, string | number> & JWTPayloadSpec
+    ) => Promise<string>;
+    readonly verify: (
+      jwt?: string | undefined
+    ) => Promise<false | (Record<string, string | number> & JWTPayloadSpec)>;
   };
 };

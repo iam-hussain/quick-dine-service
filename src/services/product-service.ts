@@ -1,4 +1,4 @@
-import db from "../providers/db";
+import db from "../providers/database";
 
 export const findManyProductsByStore = (storeId: number) => {
   return db.product.findMany({

@@ -1,18 +1,43 @@
-import { Elysia, NotFoundError } from "elysia";
+import { Elysia } from "elysia";
 import { cors } from "@elysiajs/cors";
+import { helmet } from "elysia-helmet";
+import { swagger } from "@elysiajs/swagger";
 import { staticPlugin } from "@elysiajs/static";
-import controllers from "./controllers";
-import responder from "./libs/responder";
 import { CustomError } from "./libs/custom-error";
+import logger from "./providers/logger";
+import jwtHandler from "./providers/jwt-handler";
+import routes from "./routes";
 
 const app = new Elysia()
+  .use(helmet())
   .use(cors())
   .use(staticPlugin())
-  .use(controllers)
+  .use(swagger())
+  .use(jwtHandler)
+  .use(routes)
   .error({
     CustomError,
   })
+  .onRequest(({ request }) => {
+    logger.info(`${request.method} || ${request.url}`);
+  })
+  .mapResponse(({ response, set }) => {
+    const isJson = typeof response === "object";
+
+    const text = isJson ? JSON.stringify(response) : response?.toString() ?? "";
+
+    set.headers["Content-Encoding"] = "gzip";
+
+    return new Response(Bun.gzipSync(new TextEncoder().encode(text)), {
+      headers: {
+        "Content-Type": `${
+          isJson ? "application/json" : "text/plain"
+        }; charset=utf-8`,
+      },
+    });
+  })
   .onError(({ code, error, set }) => {
+    logger.error(error);
     if (code === "NOT_FOUND") {
       set.status = 404;
     }
@@ -22,14 +47,6 @@ const app = new Elysia()
       massage: code || errorMessage,
       error: error.toString(),
     };
-  })
-  .onRequest((input) => {
-    console.log({ input });
-  })
-  .get("/", () => ({ massage: "QuickDine backend service" }))
-  .get("/ping", () => ({ massage: "pong" }))
-  .all("*", () => {
-    throw new NotFoundError();
   })
   .listen(process.env.PORT || 4000);
 
