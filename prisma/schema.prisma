@@ -60,12 +60,14 @@ model Store {
   additional Json                       @default("{}")
   addresses  Address                    @relation(fields: [addressId], references: [id])
   addressId  Int
+  images     Image[]
   tags       Tag[]
   products   Product[]
   items      Item[]
   bills      Bill[]
   consumers  BusinessAccountsOnStores[]
   customers  PersonalAccountsOnStores[]
+  expireAt   DateTime?
   deleted    Boolean                    @default(false)
   deletedAt  DateTime?
   createdAt  DateTime                   @default(now())
@@ -146,6 +148,8 @@ model Image {
   createdAt        DateTime         @default(now())
   updatedAt        DateTime         @updatedAt
   tags             Tag[]
+  store            Store?           @relation(fields: [storeId], references: [id])
+  storeId          Int?
 }
 
 enum IMAGE_TYPE {

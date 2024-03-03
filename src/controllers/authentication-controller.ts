@@ -48,6 +48,8 @@ const signIn = async ({
   return {
     access_token: await jwt.sign(tokenData),
     includes_store: stores.length === 1,
+    current_store:
+      stores.length === 1 ? storeTransformer.storePublic(stores[0]) : null,
     user: businessAccountTransformer.accountPublic(user),
     stores: storeTransformer.storesPublic(stores),
   };

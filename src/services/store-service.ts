@@ -12,6 +12,20 @@ const findByBusAccount = (accountId: number) => {
   });
 };
 
+export const findStoreDeep = (slug: string) => {
+  return db.store.findUnique({
+    where: {
+      slug,
+    },
+    include: {
+      products: true,
+      addresses: true,
+      tags: true,
+      images: true,
+    },
+  });
+};
+
 export const findBySlugAndBusAccount = (slug: string, accountId: number) => {
   return db.store.findUnique({
     where: {
