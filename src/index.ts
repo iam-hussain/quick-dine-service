@@ -3,7 +3,7 @@ import { cors } from "@elysiajs/cors";
 import { helmet } from "elysia-helmet";
 import { swagger } from "@elysiajs/swagger";
 import { staticPlugin } from "@elysiajs/static";
-import { CustomError } from "./libs/custom-error";
+import { AuthenticationError, CustomError } from "./libs/custom-error";
 import logger from "./providers/logger";
 import jwtHandler from "./providers/jwt-handler";
 import routes from "./routes";
@@ -17,6 +17,7 @@ const app = new Elysia()
   .use(routes)
   .error({
     CustomError,
+    AuthenticationError,
   })
   .onRequest(({ request }) => {
     logger.info(`${request.method} || ${request.url}`);

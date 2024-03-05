@@ -1,48 +1,48 @@
-import { AuthenticationError } from "../libs/custom-error";
+import { CustomError } from "../libs/custom-error";
 import { HandlerProps } from "../types";
 
-export function shouldNotHaveToken({ set, token }: HandlerProps) {
+export const shouldNotHaveToken = ({ set, token }: HandlerProps) => {
   if (token.hasToken) {
     set.status = "Unauthorized";
-    throw new AuthenticationError("TOKEN_FOUND");
+    throw new CustomError("TOKEN_FOUND");
   }
-}
-
-export async function shouldBeBusinessUser({ set, token }: HandlerProps) {
-  if (!token.isBusinessUser) {
-    set.status = "Unauthorized";
-    throw new AuthenticationError("INVALID_TOKEN");
-  }
-}
-
-type ThisBusinessAccountAuth = {
-  access:
-    | "store"
-    | "tag"
-    | "product"
-    | "order"
-    | "bill"
-    | "kot"
-    | "ods"
-    | "captain";
 };
 
-export async function shouldBeBusinessUserStore(
-  this: ThisBusinessAccountAuth,
-  { token, set }: HandlerProps
-) {
-  console.log({ this: this });
-
+export const shouldBeBusinessUser = ({ set, token }: HandlerProps) => {
   if (!token.isBusinessUser) {
     set.status = "Unauthorized";
-    throw new AuthenticationError("INVALID_TOKEN");
+    throw new CustomError("INVALID_TOKEN");
+  }
+};
+
+export const shouldBeBusinessUserStore = ({ token, set }: HandlerProps) => {
+  if (!token.isBusinessUser) {
+    set.status = "Unauthorized";
+    throw new CustomError("INVALID_TOKEN");
   }
 
   if (!token.hasStore) {
     set.status = "Unauthorized";
-    throw new AuthenticationError("INVALID_STORE_TOKEN");
+    throw new CustomError("INVALID_STORE_TOKEN");
   }
-}
+};
+
+// type BusinessAccountRoles =
+//   | "store"
+//   | "tag"
+//   | "product"
+//   | "order"
+//   | "bill"
+//   | "kot"
+//   | "ods"
+//   | "captain";
+
+// export const shouldBeBusinessUserStoreWithAccess = (
+//   role: BusinessAccountRoles
+// ) => {
+//   console.log({ role });
+//   return shouldBeBusinessUserStore;
+// };
 
 export default {
   shouldNotHaveToken,

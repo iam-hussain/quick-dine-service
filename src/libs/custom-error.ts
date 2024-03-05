@@ -1,6 +1,6 @@
 export class CustomError extends Error {
-  constructor(public message: string) {
-    super(message);
+  constructor(public code: string) {
+    super(code);
   }
 }
 

@@ -19,24 +19,18 @@ export default new Elysia({ name: "store_router", prefix: "/store" })
         .get("/products", productController.findManyByStoreSlug)
         .post("/product", productController.createOne, {
           body: validators.productCreate,
-          beforeHandle: shouldBeBusinessUserStore.bind({
-            access: "product",
-          }) as never,
+          beforeHandle: shouldBeBusinessUserStore as never,
           transform: inputTransform,
         })
         .put("/product", productController.updateOne, {
           body: validators.productUpdate,
           params: validators.id,
-          beforeHandle: shouldBeBusinessUserStore.bind({
-            access: "product",
-          }) as never,
+          beforeHandle: shouldBeBusinessUserStore as never,
           transform: inputTransform,
         })
         .delete("/product", productController.deleteOne, {
           params: validators.id,
-          beforeHandle: shouldBeBusinessUserStore.bind({
-            access: "product",
-          }) as never,
+          beforeHandle: shouldBeBusinessUserStore as never,
           transform: inputTransform,
         })
         .get("/tags/category", tagController.findManyCategoriesByStoreSlug)
@@ -44,24 +38,18 @@ export default new Elysia({ name: "store_router", prefix: "/store" })
         .get("/tags", tagController.findManyByStoreSlug)
         .post("/tag", tagController.createOne, {
           body: validators.tagCreate,
-          beforeHandle: shouldBeBusinessUserStore.bind({
-            access: "tag",
-          }) as never,
+          beforeHandle: shouldBeBusinessUserStore as never,
           transform: inputTransform,
         })
         .put("/tag", tagController.updateOne, {
           body: validators.tagUpdate,
           params: validators.id,
-          beforeHandle: shouldBeBusinessUserStore.bind({
-            access: "tag",
-          }) as never,
+          beforeHandle: shouldBeBusinessUserStore as never,
           transform: inputTransform,
         })
         .delete("/tag", tagController.deleteOne, {
           params: validators.id,
-          beforeHandle: shouldBeBusinessUserStore.bind({
-            access: "tag",
-          }) as never,
+          beforeHandle: shouldBeBusinessUserStore as never,
           transform: inputTransform,
         })
   );
