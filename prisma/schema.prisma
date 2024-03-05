@@ -166,11 +166,12 @@ model Tag {
   name      String
   deck      String?
   position  Int              @default(0)
+  type      PRODUCT_TAG_TYPE @default(DEFAULT)
   image     Image?           @relation(fields: [imageId], references: [id])
   imageId   Int?
   store     Store            @relation(fields: [storeId], references: [id])
   storeId   Int
-  products  ProductsOnTags[]
+  products  Product[]
   deleted   Boolean          @default(false)
   deletedAt DateTime?
   createdAt DateTime         @default(now())
@@ -182,52 +183,36 @@ enum PRODUCT_TAG_TYPE {
   CATEGORY
 }
 
-model ProductsOnTags {
-  tag        Tag              @relation(fields: [tagId], references: [id])
-  tagId      Int
-  product    Product          @relation(fields: [productId], references: [id])
-  productId  Int
-  type       PRODUCT_TAG_TYPE @default(DEFAULT)
-  assigned   Boolean          @default(true)
-  assignedAt DateTime         @default(now())
-
-  @@id([tagId, productId])
-}
-
 model Product {
-  id         Int              @id @default(autoincrement())
+  id         Int       @id @default(autoincrement())
   name       String
   deck       String?
-  price      Float            @default(0)
-  outOfStock Boolean          @default(false)
-  tags       ProductsOnTags[]
-
-  image   Image[]
-  store   Store   @relation(fields: [storeId], references: [id])
-  storeId Int
-  items   Item[]
-
-  deleted   Boolean   @default(false)
-  deletedAt DateTime?
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
+  price      Float     @default(0)
+  outOfStock Boolean   @default(false)
+  tags       Tag[]
+  image      Image[]
+  store      Store     @relation(fields: [storeId], references: [id])
+  storeId    Int
+  items      Item[]
+  deleted    Boolean   @default(false)
+  deletedAt  DateTime?
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
 }
 
 model Order {
-  id     Int          @id @default(autoincrement())
-  type   ORDER_TYPE   @default(TAKE_AWAY)
-  status ORDER_STATUS @default(DRAFT)
-  table  Int          @default(0)
-  notes  String?
-
-  items Item[]
-  bills Bill[]
-  logs  Log[]
-
-  deleted   Boolean   @default(false)
+  id        Int          @id @default(autoincrement())
+  type      ORDER_TYPE   @default(TAKE_AWAY)
+  status    ORDER_STATUS @default(DRAFT)
+  table     Int          @default(0)
+  notes     String?
+  items     Item[]
+  bills     Bill[]
+  logs      Log[]
+  deleted   Boolean      @default(false)
   deletedAt DateTime?
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
 }
 
 enum ORDER_TYPE {
@@ -250,15 +235,13 @@ enum ORDER_STATUS {
 }
 
 model Log {
-  id      Int  @id @default(autoincrement())
-  content Json @default("{}")
-
-  type      String           @default("UNKNOWN")
-  order     Order?           @relation(fields: [orderId], references: [id])
-  orderId   Int?
-  account   BusinessAccount? @relation(fields: [accountId], references: [id])
-  accountId Int?
-
+  id                Int              @id @default(autoincrement())
+  content           Json             @default("{}")
+  type              String           @default("UNKNOWN")
+  order             Order?           @relation(fields: [orderId], references: [id])
+  orderId           Int?
+  account           BusinessAccount? @relation(fields: [accountId], references: [id])
+  accountId         Int?
   createdAt         DateTime         @default(now())
   updatedAt         DateTime         @updatedAt
   PersonalAccount   PersonalAccount? @relation(fields: [personalAccountId], references: [id])

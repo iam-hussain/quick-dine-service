@@ -1,25 +1,38 @@
 import { AuthenticationError } from "../libs/custom-error";
 import { HandlerProps } from "../types";
 
-export const shouldNotHaveToken = ({ set, token }: HandlerProps) => {
-  console.log({ token });
+export function shouldNotHaveToken({ set, token }: HandlerProps) {
   if (token.hasToken) {
     set.status = "Unauthorized";
     throw new AuthenticationError("TOKEN_FOUND");
   }
-};
+}
 
-export const shouldBeBusinessUser = async ({ set, token }: HandlerProps) => {
+export async function shouldBeBusinessUser({ set, token }: HandlerProps) {
   if (!token.isBusinessUser) {
     set.status = "Unauthorized";
     throw new AuthenticationError("INVALID_TOKEN");
   }
+}
+
+type ThisBusinessAccountAuth = {
+  access:
+    | "store"
+    | "tag"
+    | "product"
+    | "order"
+    | "bill"
+    | "kot"
+    | "ods"
+    | "captain";
 };
 
-export const shouldBeBusinessUserStore = async ({
-  token,
-  set,
-}: HandlerProps) => {
+export async function shouldBeBusinessUserStore(
+  this: ThisBusinessAccountAuth,
+  { token, set }: HandlerProps
+) {
+  console.log({ this: this });
+
   if (!token.isBusinessUser) {
     set.status = "Unauthorized";
     throw new AuthenticationError("INVALID_TOKEN");
@@ -29,7 +42,7 @@ export const shouldBeBusinessUserStore = async ({
     set.status = "Unauthorized";
     throw new AuthenticationError("INVALID_STORE_TOKEN");
   }
-};
+}
 
 export default {
   shouldNotHaveToken,

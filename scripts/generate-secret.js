@@ -11,7 +11,7 @@ function generateString() {
   return generateKeySync("hmac", { length: 512 }).export().toString("hex");
 }
 
-async function setEnvValues(input) {
+async function setEnvValues(input: any) {
   try {
     if (!existsSync(envPath)) {
       writeFileSync(envPath, "");

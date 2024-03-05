@@ -1,15 +1,7 @@
 import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient({
-  log: [
-    {
-      emit: "event",
-      level: "query",
-    },
-    "info",
-    "warn",
-    "error",
-  ],
+  log: ["query", "info", "warn", "error"],
 });
 
 prisma.$on("query", (e) => {
@@ -89,6 +81,7 @@ async function main() {
       },
     },
   });
+
   const storeId = store.id;
   await prisma.businessAccountsOnStores.createMany({
     data: [
@@ -140,89 +133,85 @@ async function main() {
     },
   });
 
-  await prisma.tag.create({
+  await prisma.product.create({
     data: {
-      name: "Briyani",
-      deck: "The Special Briyani pot",
-      position: 1,
-      storeId,
-      imageId: image1.id,
-      products: {
+      name: "Mutton Briyani",
+      deck: "The Mutton Briyani Pot",
+      price: 350,
+      storeId: storeId,
+      image: {
+        create: {
+          caption: "Mutton Briyani Food",
+          altText: "The Mutton Briyani pot",
+          type: "URL",
+          content:
+            "https://media.istockphoto.com/id/980036908/photo/gosht-or-lamb-biryani-prepared-in-basmati-rice-served-with-yogurt-dip-in-terracotta-bowl.jpg?s=1024x1024&w=is&k=20&c=3ZSUuA6nf9xmdX3pWyTcb7iGTme8HudkXOe3bUJDl-c=",
+        },
+      },
+      tags: {
         create: [
           {
             type: "CATEGORY",
-            assigned: true,
-            product: {
-              create: {
-                name: "Mutton Briyani",
-                deck: "The Mutton Briyani Pot",
-                price: 350,
-                storeId: storeId,
-                image: {
-                  create: {
-                    caption: "Mutton Briyani Food",
-                    altText: "The Mutton Briyani pot",
-                    type: "URL",
-                    content:
-                      "https://media.istockphoto.com/id/980036908/photo/gosht-or-lamb-biryani-prepared-in-basmati-rice-served-with-yogurt-dip-in-terracotta-bowl.jpg?s=1024x1024&w=is&k=20&c=3ZSUuA6nf9xmdX3pWyTcb7iGTme8HudkXOe3bUJDl-c=",
-                  },
-                },
-              },
-            },
+            name: "Briyani",
+            deck: "The Special Briyani pot",
+            position: 1,
+            storeId,
+            imageId: image1.id,
+          },
+          {
+            name: "Pot",
+            storeId,
+          },
+          {
+            name: "Mutton",
+            storeId,
+          },
+          {
+            name: "Non-Veg",
+            storeId,
           },
         ],
       },
     },
   });
 
-  await prisma.tag.create({
+  const tga = await prisma.tag.create({
     data: {
       name: "Dessert",
       deck: "The Delicious Dessert",
       position: 2,
       storeId,
       imageId: image2.id,
+      type: "CATEGORY",
       products: {
         create: [
           {
-            type: "CATEGORY",
-            assigned: true,
-            product: {
+            name: "Raspberries and Pistachio Cake",
+            deck: "Delicious cake with pistachio and raspberries",
+            price: 100,
+            storeId: storeId,
+            image: {
               create: {
-                name: "Raspberries and Pistachio Cake",
-                deck: "Delicious cake with pistachio and raspberries",
-                price: 100,
-                storeId: storeId,
-                image: {
-                  create: {
-                    caption: "Raspberries and Pistachio Cake",
-                    altText: "Delicious cake with pistachio and raspberries",
-                    type: "URL",
-                    content:
-                      "https://images.unsplash.com/photo-1565958011703-44f9829ba187?q=80&w=2865&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-                  },
-                },
+                caption: "Raspberries and Pistachio Cake",
+                altText: "Delicious cake with pistachio and raspberries",
+                type: "URL",
+                content:
+                  "https://images.unsplash.com/photo-1565958011703-44f9829ba187?q=80&w=2865&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
               },
             },
           },
           {
-            type: "CATEGORY",
-            assigned: true,
-            product: {
+            name: "Chocolate Donuts",
+            deck: "Delicious donuts with chocolate",
+            price: 150,
+            storeId: storeId,
+            image: {
               create: {
-                name: "Chocolate Donuts",
-                deck: "Delicious donuts with chocolate",
-                price: 150,
-                storeId: storeId,
-                image: {
-                  create: {
-                    caption: "Chocolate Donuts",
-                    altText: "Delicious donuts with chocolate",
-                    type: "URL",
-                    content:
-                      "https://images.unsplash.com/photo-1551106652-a5bcf4b29ab6?q=80&w=2837&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-                  },
-                },
+                caption: "Chocolate Donuts",
+                altText: "Delicious donuts with chocolate",
+                type: "URL",
+                content:
+                  "https://images.unsplash.com/photo-1551106652-a5bcf4b29ab6?q=80&w=2837&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
               },
             },
           },
@@ -230,60 +219,6 @@ async function main() {
       },
     },
   });
-
-  // await prisma.product.create({
-  //   data: {
-  //     name: "Mutton Briyani",
-  //     deck: "The Mutton Briyani Pot",
-  //     price: 350,
-  //     storeId: storeId,
-  //     image: {
-  //       create: {
-  //         caption: "Mutton Briyani Food",
-  //         altText: "The Mutton Briyani pot",
-  //         type: "URL",
-  //         content:
-  //           "https://media.istockphoto.com/id/980036908/photo/gosht-or-lamb-biryani-prepared-in-basmati-rice-served-with-yogurt-dip-in-terracotta-bowl.jpg?s=1024x1024&w=is&k=20&c=3ZSUuA6nf9xmdX3pWyTcb7iGTme8HudkXOe3bUJDl-c=",
-  //       },
-  //     },
-  //   },
-  // });
-
-  // await prisma.product.create({
-  //   data: {
-  //     name: "Raspberries and Pistachio Cake",
-  //     deck: "Delicious cake with pistachio and raspberries",
-  //     price: 100,
-  //     storeId: storeId,
-  //     image: {
-  //       create: {
-  //         caption: "Raspberries and Pistachio Cake",
-  //         altText: "Delicious cake with pistachio and raspberries",
-  //         type: "URL",
-  //         content:
-  //           "https://images.unsplash.com/photo-1565958011703-44f9829ba187?q=80&w=2865&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-  //       },
-  //     },
-  //   },
-  // });
-
-  // await prisma.product.create({
-  //   data: {
-  //     name: "Chocolate Donuts",
-  //     deck: "Delicious donuts with chocolate",
-  //     price: 150,
-  //     storeId: storeId,
-  //     image: {
-  //       create: {
-  //         caption: "Chocolate Donuts",
-  //         altText: "Delicious donuts with chocolate",
-  //         type: "URL",
-  //         content:
-  //           "https://images.unsplash.com/photo-1551106652-a5bcf4b29ab6?q=80&w=2837&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-  //       },
-  //     },
-  //   },
-  // });
   return true;
 }
 main()

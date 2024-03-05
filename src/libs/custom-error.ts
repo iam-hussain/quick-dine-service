@@ -5,7 +5,7 @@ export class CustomError extends Error {
 }
 
 export class AuthenticationError extends Error {
-  constructor(public message: string) {
-    super(message);
+  constructor(public code: string) {
+    super(code);
   }
 }

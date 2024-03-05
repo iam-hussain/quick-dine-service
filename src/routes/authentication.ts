@@ -1,6 +1,9 @@
 import { Elysia } from "elysia";
 import validators from "../validators";
-import { shouldNotHaveToken } from "../providers/authorization";
+import {
+  shouldBeBusinessUser,
+  shouldNotHaveToken,
+} from "../providers/authorization";
 import authenticationController from "../controllers/authentication-controller";
 
 export default new Elysia({
@@ -12,4 +15,6 @@ export default new Elysia({
     beforeHandle: shouldNotHaveToken as never,
   })
   .post("/sign-up", () => "Sign up")
-  .post("/profile", () => "Profile");
+  .get("/business-profile", () => "Profile", {
+    beforeHandle: shouldBeBusinessUser as never,
+  });

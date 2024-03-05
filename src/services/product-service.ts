@@ -1,9 +1,11 @@
-import db from "../providers/database";
+import database from "../providers/database";
 
-export const findManyProductsByStore = (storeId: number) => {
-  return db.product.findMany({
+const findManyByStoreSlug = (slug: string) => {
+  return database.product.findMany({
     where: {
-      storeId,
+      store: {
+        slug,
+      },
     },
     include: {
       tags: {
@@ -13,4 +15,10 @@ export const findManyProductsByStore = (storeId: number) => {
       },
     },
   });
+};
+
+const createOne = ({}) => {};
+
+export default {
+  findManyByStoreSlug,
 };

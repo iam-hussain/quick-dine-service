@@ -1,7 +1,7 @@
-import db from "../providers/database";
+import database from "../providers/database";
 
 const findByBusAccount = (accountId: number) => {
-  return db.store.findMany({
+  return database.store.findMany({
     where: {
       consumers: {
         some: {
@@ -13,7 +13,7 @@ const findByBusAccount = (accountId: number) => {
 };
 
 export const findStoreDeep = (slug: string) => {
-  return db.store.findUnique({
+  return database.store.findUnique({
     where: {
       slug,
     },
@@ -27,7 +27,7 @@ export const findStoreDeep = (slug: string) => {
 };
 
 export const findBySlugAndBusAccount = (slug: string, accountId: number) => {
-  return db.store.findUnique({
+  return database.store.findUnique({
     where: {
       slug,
       consumers: {
@@ -39,7 +39,16 @@ export const findBySlugAndBusAccount = (slug: string, accountId: number) => {
   });
 };
 
+export const findBySlug = (slug: string) => {
+  return database.store.findUnique({
+    where: {
+      slug,
+    },
+  });
+};
+
 export default {
+  findBySlug,
   findByBusAccount,
   findBySlugAndBusAccount,
 };

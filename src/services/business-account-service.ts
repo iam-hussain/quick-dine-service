@@ -1,7 +1,7 @@
-import db from "../providers/database";
+import database from "../providers/database";
 
 const findByEmail = (email: string) => {
-  return db.businessAccount.findUnique({
+  return database.businessAccount.findUnique({
     where: {
       email,
     },

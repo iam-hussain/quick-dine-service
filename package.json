@@ -1,6 +1,7 @@
 {
   "name": "quick-dine-service",
   "version": "1.0.50",
+  "type": "module",
   "scripts": {
     "dev": "bun run --watch src/index.ts",
     "build": "bun build src/index.ts --target=bun --outdir=out",
@@ -12,14 +13,14 @@
     "prisma:pull": "prisma db pull",
     "prisma:push": "prisma db push",
     "prisma:seed": "prisma db seed",
-    "prisma:studio": "npx prisma studio",
-    "prisma:reset": "npm run script:prisma:truncate && npm run prisma:seed",
-    "prisma:setup": "npm run prisma:generate && npm run prisma:deploy",
-    "script:prisma:truncate": "node ./scripts/truncate-db.mjs",
-    "script:generate:secret": "node ./scripts/generate-secret.mjs"
+    "prisma:studio": "bun prisma studio",
+    "prisma:reset": "bun run script:prisma:truncate && bun run prisma:seed",
+    "prisma:setup": "bun run prisma:generate && bun run prisma:deploy",
+    "script:prisma:truncate": "bun ./scripts/truncate-db.js",
+    "script:generate:secret": "bun ./scripts/generate-secret.js"
   },
   "prisma": {
-    "seed": "node prisma/seed.mjs"
+    "seed": "node prisma/seed.js"
   },
   "dependencies": {
     "@elysiajs/cors": "^0.8.0",

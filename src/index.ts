@@ -41,11 +41,9 @@ const app = new Elysia()
     if (code === "NOT_FOUND") {
       set.status = 404;
     }
-    const errorMessage = error.message || "UNEXPECTED_ERROR";
 
     return {
-      massage: code || errorMessage,
-      error: error.toString(),
+      ...error,
     };
   })
   .listen(process.env.PORT || 4000);
