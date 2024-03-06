@@ -1,17 +1,17 @@
 const inputTransform = ({ body, params }: any) => {
-  if (body.price) {
+  if (body?.price) {
     body.price = Number(body.price);
   }
 
-  if (body.position) {
+  if (body?.position) {
     body.position = Number(body.position);
   }
 
-  if (body.tags) {
+  if (body?.tags) {
     body.tags = body.tags?.map(Number);
   }
 
-  if (params.id) {
+  if (params?.id) {
     params.id = Number(params.id);
   }
 };

@@ -16,6 +16,20 @@ const storeBySlug = async ({
   return storeTransformer.storePublic(store);
 };
 
+const storeByToken = async ({ token, set }: HandlerProps) => {
+  console.log({ token });
+  if (typeof token.decoded === "boolean") {
+    return {};
+  }
+  const store = await storeService.findBySlug(token.decoded?.store as string);
+  if (!store) {
+    set.status = "Precondition Failed";
+    throw new CustomError("INVALID_STORE");
+  }
+  return storeTransformer.storePublic(store);
+};
+
 export default {
   storeBySlug,
+  storeByToken,
 };

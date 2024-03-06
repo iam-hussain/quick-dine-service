@@ -6,12 +6,23 @@ import productController from "../controllers/product-controller";
 import { shouldBeBusinessUserStore } from "../providers/authorization";
 import inputTransform from "../transformers/input-transformer";
 
-export default new Elysia({ name: "store_router", prefix: "/store" })
-  .get("/", () => "Stores", {})
+export default new Elysia({
+  name: "store_router",
+  prefix: "/store",
+})
+  .get("/", storeController.storeByToken, {
+    beforeHandle: shouldBeBusinessUserStore as never,
+    transform: inputTransform,
+  })
+  .get("/tags", tagController.findManyByTokenStoreSlug, {
+    beforeHandle: shouldBeBusinessUserStore as never,
+    transform: inputTransform,
+  })
   .group(
     "/:slug",
     {
       params: validators.storeSlug,
+      transform: inputTransform,
     },
     (app) =>
       app

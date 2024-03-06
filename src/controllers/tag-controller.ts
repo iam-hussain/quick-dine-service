@@ -24,6 +24,17 @@ const findManyByStoreSlug = async ({
   return tags;
 };
 
+const findManyByTokenStoreSlug = async ({ token }: HandlerProps) => {
+  if (typeof token.decoded === "boolean") {
+    return [];
+  }
+
+  const tags = await tagService.findManyByStoreSlug(
+    (token.decoded?.store as string) || ""
+  );
+  return tags;
+};
+
 const createOne = async ({
   params: { slug },
   body,
@@ -98,6 +109,7 @@ export default {
   updateOne,
   deleteOne,
   findManyByStoreSlug,
+  findManyByTokenStoreSlug,
   findManyCategoriesByStoreSlug,
   findManyDefaultTagsByStoreSlug,
 };
