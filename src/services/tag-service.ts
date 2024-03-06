@@ -38,6 +38,9 @@ const findManyByStoreSlug = (slug: string) => {
     include: {
       products: true,
     },
+    orderBy: {
+      id: "desc",
+    },
   });
 };
 
