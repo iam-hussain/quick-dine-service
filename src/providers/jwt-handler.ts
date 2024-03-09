@@ -31,7 +31,7 @@ export default new Elysia({ name: "jwt_handler" })
     jwt({
       name: "jwt",
       secret: SECRET,
-      exp: "1d",
+      exp: "7d",
     })
   )
   .derive(async ({ jwt, headers }) => {
