@@ -1,7 +1,7 @@
 import { t } from "elysia";
 
 const id = t.Object({
-  id: t.Numeric(),
+  id: t.String(),
 });
 
 const signIn = t.Object({
@@ -17,24 +17,24 @@ const productCreate = t.Object({
   name: t.String(),
   deck: t.Optional(t.String()),
   price: t.Number(),
-  tags: t.Optional(t.Array(t.Integer())),
+  categoryId: t.String(),
 });
 
 const productUpdate = t.Object({
   name: t.Optional(t.String()),
   deck: t.Optional(t.String()),
   price: t.Optional(t.Number()),
-  tags: t.Optional(t.Array(t.Integer())),
+  categoryId: t.Optional(t.String()),
   outOfStock: t.Optional(t.Boolean()),
 });
 
-const tagCreate = t.Object({
+const categoryCreate = t.Object({
   name: t.String(),
   deck: t.Optional(t.String()),
   position: t.Optional(t.Integer()),
 });
 
-const tagUpdate = t.Object({
+const categoryUpdate = t.Object({
   name: t.Optional(t.String()),
   deck: t.Optional(t.String()),
   position: t.Optional(t.Integer()),
@@ -46,6 +46,6 @@ export default {
   storeSlug,
   productCreate,
   productUpdate,
-  tagCreate,
-  tagUpdate,
+  categoryCreate,
+  categoryUpdate,
 };

@@ -1,5 +1,5 @@
 // import { Product, ProductsOnTags, Store, Tag } from "@prisma/client";
-// import { dateTimeFormat } from "../libs/date";
+// import { getDateTimeFormat } from "../libs/date";
 // import { findManyProductsByStore } from "../services/product-service";
 
 // export const transformProduct = (
@@ -20,7 +20,7 @@
 // export const transformStore = (store: Store) => {
 //   return {
 //     ...store,
-//     createdAt$: dateTimeFormat(store.createdAt),
-//     updatedAt$: dateTimeFormat(store.updatedAt),
+//     createdAt$: getDateTimeFormat(store.createdAt),
+//     updatedAt$: getDateTimeFormat(store.updatedAt),
 //   };
 // };

@@ -1,10 +1,12 @@
 import { PrismaClient } from "@prisma/client";
+import { create } from "lodash";
+import idGenerator from "../src/libs/id-generator";
 
 const prisma = new PrismaClient({
   log: ["query", "info", "warn", "error"],
 });
 
-prisma.$on("query", (e) => {
+prisma.$on("query" as never, (e: any) => {
   console.log("Query: " + e.query);
   console.log("Duration: " + e.duration + "ms");
 });
@@ -12,6 +14,7 @@ prisma.$on("query", (e) => {
 async function main() {
   const alice = await prisma.businessAccount.create({
     data: {
+      shortId: idGenerator.generateShortID(),
       firstName: "Alice",
       email: "alice@prisma.io",
       username: "alice",
@@ -23,6 +26,7 @@ async function main() {
 
   const bob = await prisma.businessAccount.create({
     data: {
+      shortId: idGenerator.generateShortID(),
       firstName: "Bob",
       email: "bob@prisma.io",
       username: "bobs",
@@ -34,6 +38,7 @@ async function main() {
 
   const charlie = await prisma.businessAccount.create({
     data: {
+      shortId: idGenerator.generateShortID(),
       firstName: "Charlie",
       email: "charlie@prisma.io",
       username: "charlie",
@@ -45,6 +50,7 @@ async function main() {
 
   const danny = await prisma.businessAccount.create({
     data: {
+      shortId: idGenerator.generateShortID(),
       firstName: "Danny",
       email: "danny@prisma.io",
       username: "danny",
@@ -56,6 +62,7 @@ async function main() {
 
   const elena = await prisma.businessAccount.create({
     data: {
+      shortId: idGenerator.generateShortID(),
       firstName: "Elena",
       email: "elena@prisma.io",
       username: "elena",
@@ -67,6 +74,7 @@ async function main() {
 
   const store = await prisma.store.create({
     data: {
+      prefix: "ac",
       name: "A Canteen",
       slug: "a-canteen",
       tables: 5,
@@ -115,6 +123,7 @@ async function main() {
 
   const image1 = await prisma.image.create({
     data: {
+      shortId: idGenerator.generateShortID(),
       caption: "Briyani Food",
       altText: "The Briyani pot",
       type: "URL",
@@ -125,6 +134,7 @@ async function main() {
 
   const image2 = await prisma.image.create({
     data: {
+      shortId: idGenerator.generateShortID(),
       caption: "Briyani Food",
       altText: "The Briyani Food",
       type: "URL",
@@ -133,65 +143,55 @@ async function main() {
     },
   });
 
-  await prisma.product.create({
+  await prisma.category.create({
     data: {
-      name: "Mutton Briyani",
-      deck: "The Mutton Briyani Pot",
-      price: 350,
-      storeId: storeId,
-      image: {
+      name: "Briyani",
+      deck: "The Special Briyani pot",
+      position: 1,
+      imageId: image1.id,
+      storeId,
+      shortId: idGenerator.generateShortID(),
+      products: {
         create: {
-          caption: "Mutton Briyani Food",
-          altText: "The Mutton Briyani pot",
-          type: "URL",
-          content:
-            "https://media.istockphoto.com/id/980036908/photo/gosht-or-lamb-biryani-prepared-in-basmati-rice-served-with-yogurt-dip-in-terracotta-bowl.jpg?s=1024x1024&w=is&k=20&c=3ZSUuA6nf9xmdX3pWyTcb7iGTme8HudkXOe3bUJDl-c=",
+          name: "Mutton Briyani",
+          deck: "The Mutton Briyani Pot",
+          price: 350,
+          storeId: storeId,
+          shortId: idGenerator.generateShortID(),
+          image: {
+            create: {
+              shortId: idGenerator.generateShortID(),
+              caption: "Mutton Briyani Food",
+              altText: "The Mutton Briyani pot",
+              type: "URL",
+              content:
+                "https://media.istockphoto.com/id/980036908/photo/gosht-or-lamb-biryani-prepared-in-basmati-rice-served-with-yogurt-dip-in-terracotta-bowl.jpg?s=1024x1024&w=is&k=20&c=3ZSUuA6nf9xmdX3pWyTcb7iGTme8HudkXOe3bUJDl-c=",
+            },
+          },
         },
-      },
-      tags: {
-        create: [
-          {
-            type: "CATEGORY",
-            name: "Briyani",
-            deck: "The Special Briyani pot",
-            position: 1,
-            storeId,
-            imageId: image1.id,
-          },
-          {
-            name: "Pot",
-            storeId,
-          },
-          {
-            name: "Mutton",
-            storeId,
-          },
-          {
-            name: "Non-Veg",
-            storeId,
-          },
-        ],
       },
     },
   });
 
-  const tga = await prisma.tag.create({
+  await prisma.category.create({
     data: {
       name: "Dessert",
       deck: "The Delicious Dessert",
       position: 2,
       storeId,
       imageId: image2.id,
-      type: "CATEGORY",
+      shortId: idGenerator.generateShortID(),
       products: {
         create: [
           {
+            shortId: idGenerator.generateShortID(),
             name: "Raspberries and Pistachio Cake",
             deck: "Delicious cake with pistachio and raspberries",
             price: 100,
             storeId: storeId,
             image: {
               create: {
+                shortId: idGenerator.generateShortID(),
                 caption: "Raspberries and Pistachio Cake",
                 altText: "Delicious cake with pistachio and raspberries",
                 type: "URL",
@@ -205,8 +205,10 @@ async function main() {
             deck: "Delicious donuts with chocolate",
             price: 150,
             storeId: storeId,
+            shortId: idGenerator.generateShortID(),
             image: {
               create: {
+                shortId: idGenerator.generateShortID(),
                 caption: "Chocolate Donuts",
                 altText: "Delicious donuts with chocolate",
                 type: "URL",

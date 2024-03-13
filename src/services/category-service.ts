@@ -1,14 +1,11 @@
 import database from "../providers/database";
 
 const findManyByStoreSlug = (slug: string) => {
-  return database.product.findMany({
+  return database.category.findMany({
     where: {
       store: {
         slug,
       },
-    },
-    include: {
-      category: true,
     },
   });
 };

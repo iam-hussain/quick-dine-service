@@ -1,6 +1,6 @@
 import database from "../providers/database";
 
-const findByBusAccount = (accountId: number) => {
+const findByBusAccount = (accountId: string) => {
   return database.store.findMany({
     where: {
       consumers: {
@@ -20,13 +20,12 @@ export const findStoreDeep = (slug: string) => {
     include: {
       products: true,
       addresses: true,
-      tags: true,
       images: true,
     },
   });
 };
 
-export const findBySlugAndBusAccount = (slug: string, accountId: number) => {
+export const findBySlugAndBusAccount = (slug: string, accountId: string) => {
   return database.store.findUnique({
     where: {
       slug,

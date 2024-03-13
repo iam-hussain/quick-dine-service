@@ -16,11 +16,11 @@
     "prisma:studio": "bun prisma studio",
     "prisma:reset": "bun run script:prisma:truncate && bun run prisma:seed",
     "prisma:setup": "bun run prisma:generate && bun run prisma:deploy",
-    "script:prisma:truncate": "bun ./scripts/truncate-db.js",
-    "script:generate:secret": "bun ./scripts/generate-secret.js"
+    "script:prisma:truncate": "bun ./scripts/truncate-db.ts",
+    "script:generate:secret": "bun ./scripts/generate-secret.ts"
   },
   "prisma": {
-    "seed": "node prisma/seed.js"
+    "seed": "tsx prisma/seed.ts"
   },
   "dependencies": {
     "@elysiajs/cors": "^0.8.0",
@@ -31,13 +31,19 @@
     "@types/lodash": "^4.14.202",
     "elysia": "latest",
     "elysia-helmet": "^1.0.2",
+    "flat-cache": "^4.0.1",
     "lodash": "^4.17.21",
-    "moment": "^2.30.1",
+    "moment-timezone": "^0.5.45",
+    "nanoid": "^5.0.6",
+    "uuid": "^9.0.1",
     "winston": "^3.11.0"
   },
   "devDependencies": {
+    "@types/flat-cache": "^2.0.2",
+    "@types/uuid": "^9.0.8",
     "bun-types": "latest",
-    "prisma": "^5.10.2"
+    "prisma": "^5.10.2",
+    "tsx": "^4.7.1"
   },
   "module": "src/index.js"
 }

@@ -1,7 +1,7 @@
 import { Elysia } from "elysia";
 import storeController from "../controllers/store-controller";
 import validators from "../validators";
-import tagController from "../controllers/tag-controller";
+import categoryController from "../controllers/category-controller";
 import productController from "../controllers/product-controller";
 import { shouldBeBusinessUserStore } from "../providers/authorization";
 import inputTransform from "../transformers/input-transformer";
@@ -14,7 +14,11 @@ export default new Elysia({
     beforeHandle: shouldBeBusinessUserStore as never,
     transform: inputTransform,
   })
-  .get("/tags", tagController.findManyByTokenStoreSlug, {
+  .get("/categories", categoryController.findManyByTokenStoreSlug, {
+    beforeHandle: shouldBeBusinessUserStore as never,
+    transform: inputTransform,
+  })
+  .get("/products", categoryController.findManyByTokenStoreSlug, {
     beforeHandle: shouldBeBusinessUserStore as never,
     transform: inputTransform,
   })
@@ -44,21 +48,19 @@ export default new Elysia({
           beforeHandle: shouldBeBusinessUserStore as never,
           transform: inputTransform,
         })
-        .get("/tags/category", tagController.findManyCategoriesByStoreSlug)
-        .get("/tags/tag", tagController.findManyDefaultTagsByStoreSlug)
-        .get("/tags", tagController.findManyByStoreSlug)
-        .post("/tag", tagController.createOne, {
-          body: validators.tagCreate,
+        .get("/categories", categoryController.findManyByStoreSlug)
+        .post("/category", categoryController.createOne, {
+          body: validators.categoryCreate,
           beforeHandle: shouldBeBusinessUserStore as never,
           transform: inputTransform,
         })
-        .put("/tag", tagController.updateOne, {
-          body: validators.tagUpdate,
+        .put("/category", categoryController.updateOne, {
+          body: validators.categoryUpdate,
           params: validators.id,
           beforeHandle: shouldBeBusinessUserStore as never,
           transform: inputTransform,
         })
-        .delete("/tag", tagController.deleteOne, {
+        .delete("/category", categoryController.deleteOne, {
           params: validators.id,
           beforeHandle: shouldBeBusinessUserStore as never,
           transform: inputTransform,

@@ -11,7 +11,8 @@ datasource db {
 }
 
 model BusinessAccount {
-  id            Int                        @id @default(autoincrement())
+  id            String                     @id @default(uuid())
+  shortId       String                     @unique
   firstName     String
   lastName      String?
   email         String                     @unique
@@ -22,7 +23,7 @@ model BusinessAccount {
   emailVerified Boolean                    @default(false)
   phoneVerified Boolean                    @default(false)
   image         Image?                     @relation(fields: [imageId], references: [id])
-  imageId       Int?                       @unique
+  imageId       String?                    @unique
   addresses     Address[]
   logs          Log[]
   stores        BusinessAccountsOnStores[]
@@ -36,9 +37,9 @@ model BusinessAccountsOnStores {
   administer Boolean         @default(false)
   access     Json            @default("{}")
   account    BusinessAccount @relation(fields: [accountId], references: [id])
-  accountId  Int
+  accountId  String
   store      Store           @relation(fields: [storeId], references: [id])
-  storeId    Int
+  storeId    String
   assigned   Boolean         @default(true)
   assignedAt DateTime        @default(now())
   deleted    Boolean         @default(false)
@@ -50,18 +51,19 @@ model BusinessAccountsOnStores {
 }
 
 model Store {
-  id         Int                        @id @default(autoincrement())
+  id         String                     @id @default(uuid())
+  slug       String                     @unique
+  prefix     String                     @unique
   name       String
   deck       String?
-  slug       String                     @unique
   email      String?
   phone      String?
   tables     Int                        @default(0)
   additional Json                       @default("{}")
   addresses  Address                    @relation(fields: [addressId], references: [id])
-  addressId  Int
+  addressId  String
   images     Image[]
-  tags       Tag[]
+  categories Category[]
   products   Product[]
   items      Item[]
   bills      Bill[]
@@ -76,9 +78,9 @@ model Store {
 
 model PersonalAccountsOnStores {
   account    PersonalAccount @relation(fields: [accountId], references: [id])
-  accountId  Int
+  accountId  String
   store      Store           @relation(fields: [storeId], references: [id])
-  storeId    Int
+  storeId    String
   originated Boolean         @default(false)
   assigned   Boolean         @default(true)
   assignedAt DateTime        @default(now())
@@ -91,7 +93,8 @@ model PersonalAccountsOnStores {
 }
 
 model PersonalAccount {
-  id            Int                        @id @default(autoincrement())
+  id            String                     @id @default(uuid())
+  shortId       String                     @unique
   firstName     String
   lastName      String?
   email         String?
@@ -103,7 +106,7 @@ model PersonalAccount {
   phoneVerified Boolean                    @default(false)
   passwordAdded Boolean                    @default(false)
   image         Image?                     @relation(fields: [imageId], references: [id])
-  imageId       Int?                       @unique
+  imageId       String?                    @unique
   addresses     Address[]
   logs          Log[]
   stores        PersonalAccountsOnStores[]
@@ -114,7 +117,7 @@ model PersonalAccount {
 }
 
 model Address {
-  id                Int              @id @default(autoincrement())
+  id                String           @id @default(uuid())
   line1             String
   line2             String?
   state             String
@@ -122,9 +125,9 @@ model Address {
   pincode           String
   position          Int              @default(1)
   personalAccount   PersonalAccount? @relation(fields: [personalAccountId], references: [id])
-  personalAccountId Int?
+  personalAccountId String?
   businessAccount   BusinessAccount? @relation(fields: [businessAccountId], references: [id])
-  businessAccountId Int?
+  businessAccountId String?
   stores            Store[]
   deleted           Boolean          @default(false)
   deletedAt         DateTime?
@@ -133,23 +136,24 @@ model Address {
 }
 
 model Image {
-  id               Int              @id @default(autoincrement())
+  id               String           @id @default(uuid())
+  shortId          String           @unique
   caption          String?
   altText          String?
   content          String
   type             IMAGE_TYPE       @default(PUBLIC)
   position         Int              @default(1)
   product          Product?         @relation(fields: [productId], references: [id])
-  productId        Int?
+  productId        String?
   businessAccount  BusinessAccount?
   personalAccounts PersonalAccount?
+  store            Store?           @relation(fields: [storeId], references: [id])
+  storeId          String?
+  category         Category?
   deleted          Boolean          @default(false)
   deletedAt        DateTime?
   createdAt        DateTime         @default(now())
   updatedAt        DateTime         @updatedAt
-  tags             Tag[]
-  store            Store?           @relation(fields: [storeId], references: [id])
-  storeId          Int?
 }
 
 enum IMAGE_TYPE {
@@ -161,47 +165,52 @@ enum IMAGE_TYPE {
   COLOR
 }
 
-model Tag {
-  id        Int              @id @default(autoincrement())
+model Category {
+  id        String    @id @default(uuid())
+  shortId   String    @unique
   name      String
   deck      String?
-  position  Int              @default(0)
-  type      PRODUCT_TAG_TYPE @default(DEFAULT)
-  image     Image?           @relation(fields: [imageId], references: [id])
-  imageId   Int?
-  store     Store            @relation(fields: [storeId], references: [id])
-  storeId   Int
+  position  Int       @default(0)
+  image     Image?    @relation(fields: [imageId], references: [id])
+  imageId   String?   @unique
+  store     Store     @relation(fields: [storeId], references: [id])
+  storeId   String
   products  Product[]
-  deleted   Boolean          @default(false)
+  deleted   Boolean   @default(false)
   deletedAt DateTime?
-  createdAt DateTime         @default(now())
-  updatedAt DateTime         @updatedAt
-}
-
-enum PRODUCT_TAG_TYPE {
-  DEFAULT
-  CATEGORY
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
 }
 
 model Product {
-  id         Int       @id @default(autoincrement())
+  id         String       @id @default(uuid())
+  shortId    String       @unique
   name       String
   deck       String?
-  price      Float     @default(0)
-  outOfStock Boolean   @default(false)
-  tags       Tag[]
+  price      Float        @default(0)
+  outOfStock Boolean      @default(false)
+  type       PRODUCT_TYPE @default(NON_VEG)
   image      Image[]
-  store      Store     @relation(fields: [storeId], references: [id])
-  storeId    Int
+  store      Store        @relation(fields: [storeId], references: [id])
+  storeId    String
+  category   Category?    @relation(fields: [categoryId], references: [id])
+  categoryId String?
   items      Item[]
-  deleted    Boolean   @default(false)
+  deleted    Boolean      @default(false)
   deletedAt  DateTime?
-  createdAt  DateTime  @default(now())
-  updatedAt  DateTime  @updatedAt
+  createdAt  DateTime     @default(now())
+  updatedAt  DateTime     @updatedAt
+}
+
+enum PRODUCT_TYPE {
+  VEG
+  NON_VEG
+  VEGAN
 }
 
 model Order {
-  id        Int          @id @default(autoincrement())
+  id        String       @id @default(uuid())
+  shortId   String       @unique
   type      ORDER_TYPE   @default(TAKE_AWAY)
   status    ORDER_STATUS @default(DRAFT)
   table     Int          @default(0)
@@ -235,21 +244,21 @@ enum ORDER_STATUS {
 }
 
 model Log {
-  id                Int              @id @default(autoincrement())
+  id                String           @id @default(uuid())
   content           Json             @default("{}")
   type              String           @default("UNKNOWN")
   order             Order?           @relation(fields: [orderId], references: [id])
-  orderId           Int?
+  orderId           String?
   account           BusinessAccount? @relation(fields: [accountId], references: [id])
-  accountId         Int?
+  accountId         String?
   createdAt         DateTime         @default(now())
   updatedAt         DateTime         @updatedAt
   PersonalAccount   PersonalAccount? @relation(fields: [personalAccountId], references: [id])
-  personalAccountId Int?
+  personalAccountId String?
 }
 
 model Item {
-  id         Int         @id @default(autoincrement())
+  id         String      @id @default(uuid())
   title      String?
   note       String?
   price      Float       @default(0)
@@ -262,13 +271,13 @@ model Item {
   startAfter DateTime    @default(now())
 
   product   Product @relation(fields: [productId], references: [id])
-  productId Int
+  productId String
   order     Order   @relation(fields: [orderId], references: [id])
-  orderId   Int
+  orderId   String
   bill      Bill?   @relation(fields: [billId], references: [id])
-  billId    Int?
+  billId    String?
   store     Store   @relation(fields: [storeId], references: [id])
-  storeId   Int
+  storeId   String
 
   deleted   Boolean   @default(false)
   deletedAt DateTime?
@@ -286,7 +295,8 @@ enum ITEM_STATUS {
 }
 
 model Bill {
-  id             Int          @id @default(autoincrement())
+  id             String       @id @default(uuid())
+  shortId        String       @unique
   totalPrice     Float        @default(0)
   taxAmount      Float        @default(0)
   stateTaxAmount Float        @default(0)
@@ -302,9 +312,9 @@ model Bill {
 
   items   Item[]
   order   Order  @relation(fields: [orderId], references: [id])
-  orderId Int
+  orderId String
   store   Store  @relation(fields: [storeId], references: [id])
-  storeId Int
+  storeId String
 
   deleted   Boolean   @default(false)
   deletedAt DateTime?

@@ -3,12 +3,24 @@ import { HandlerProps } from "../types";
 import validators from "../validators";
 import productService from "../services/product-service";
 import _ from "lodash";
+import idGenerator from "../libs/id-generator";
 
 const findManyByStoreSlug = async ({
   params: { slug },
 }: HandlerProps & { params: typeof validators.storeSlug.static }) => {
   const products = await productService.findManyByStoreSlug(slug);
   return products;
+};
+
+const findManyByTokenStoreSlug = async ({ token }: HandlerProps) => {
+  if (typeof token.decoded === "boolean") {
+    return [];
+  }
+
+  const categories = await productService.findManyByStoreSlug(
+    (token.decoded?.store as string) || ""
+  );
+  return categories;
 };
 
 const createOne = async ({
@@ -18,20 +30,20 @@ const createOne = async ({
   params: typeof validators.storeSlug.static;
   body: typeof validators.productCreate.static;
 }) => {
-  const tags = body.tags || [];
   const product = await database.product.create({
     data: {
       name: body.name,
       deck: body.deck,
+      shortId: idGenerator.generateShortID(),
       store: {
         connect: {
           slug,
         },
       },
-      tags: {
-        connect: tags.map((id) => ({
-          id,
-        })),
+      category: {
+        connect: {
+          id: body.categoryId,
+        },
       },
     },
   });
@@ -47,47 +59,13 @@ const updateOne = async ({
   params: typeof validators.storeSlug.static & typeof validators.id.static;
   body: typeof validators.productUpdate.static;
 }) => {
-  const { tags, ...inputs } = body;
-  const product = await database.product.findUnique({
-    where: {
-      id: Number(id),
-      store: {
-        slug,
-      },
-    },
-    select: {
-      id: true,
-      tags: {
-        select: {
-          id: true,
-          type: true,
-        },
-      },
-    },
-  });
-
-  if (!product?.id) {
-    set.status = "Precondition Failed";
-    throw new CustomError("INVALID_ID");
-  }
-
-  const newTags = body.tags || [];
-  const oldTags = product.tags.map(({ id }) => id);
-
-  const intersection = _.intersection(newTags, oldTags);
-  const connect = _.without(newTags, ...intersection);
-  const disconnect = _.without(oldTags, ...intersection);
-
   const products = await database.product.update({
     where: {
-      id: Number(id),
+      id,
+      store: { slug },
     },
     data: {
-      ...inputs,
-      tags: {
-        connect: connect.map((id) => ({ id })),
-        disconnect: disconnect.map((id) => ({ id })),
-      },
+      ...body,
     },
   });
 
@@ -102,7 +80,7 @@ const deleteOne = async ({
 }) => {
   const history = await database.item.count({
     where: {
-      productId: Number(id),
+      productId: id,
       store: {
         slug,
       },
@@ -139,4 +117,5 @@ export default {
   updateOne,
   deleteOne,
   findManyByStoreSlug,
+  findManyByTokenStoreSlug,
 };

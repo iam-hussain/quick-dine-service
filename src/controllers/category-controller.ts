@@ -1,27 +1,14 @@
 import { CustomError } from "../libs/custom-error";
 import { HandlerProps } from "../types";
 import validators from "../validators";
-import tagService from "../services/tag-service";
-
-const findManyCategoriesByStoreSlug = async ({
-  params: { slug },
-}: HandlerProps & { params: typeof validators.storeSlug.static }) => {
-  const categories = await tagService.findManyCatsByStoreSlug(slug);
-  return categories;
-};
-
-const findManyDefaultTagsByStoreSlug = async ({
-  params: { slug },
-}: HandlerProps & { params: typeof validators.storeSlug.static }) => {
-  const tags = await tagService.findManyTagsByStoreSlug(slug);
-  return tags;
-};
+import categoryService from "../services/category-service";
+import idGenerator from "../libs/id-generator";
 
 const findManyByStoreSlug = async ({
   params: { slug },
 }: HandlerProps & { params: typeof validators.storeSlug.static }) => {
-  const tags = await tagService.findManyByStoreSlug(slug);
-  return tags;
+  const categories = await categoryService.findManyByStoreSlug(slug);
+  return categories;
 };
 
 const findManyByTokenStoreSlug = async ({ token }: HandlerProps) => {
@@ -29,10 +16,10 @@ const findManyByTokenStoreSlug = async ({ token }: HandlerProps) => {
     return [];
   }
 
-  const tags = await tagService.findManyByStoreSlug(
+  const categories = await categoryService.findManyByStoreSlug(
     (token.decoded?.store as string) || ""
   );
-  return tags;
+  return categories;
 };
 
 const createOne = async ({
@@ -40,11 +27,12 @@ const createOne = async ({
   body,
 }: HandlerProps & {
   params: typeof validators.storeSlug.static;
-  body: typeof validators.tagCreate.static;
+  body: typeof validators.categoryCreate.static;
 }) => {
-  const tag = await database.tag.create({
+  const category = await database.category.create({
     data: {
       ...body,
+      shortId: idGenerator.generateShortID(),
       store: {
         connect: {
           slug,
@@ -52,7 +40,7 @@ const createOne = async ({
       },
     },
   });
-  return tag;
+  return category;
 };
 
 const updateOne = async ({
@@ -60,9 +48,9 @@ const updateOne = async ({
   body,
 }: HandlerProps & {
   params: typeof validators.storeSlug.static & typeof validators.id.static;
-  body: typeof validators.tagUpdate.static;
+  body: typeof validators.categoryUpdate.static;
 }) => {
-  const tag = await database.tag.update({
+  const category = await database.category.update({
     where: {
       id,
       store: {
@@ -73,7 +61,7 @@ const updateOne = async ({
       ...body,
     },
   });
-  return tag;
+  return category;
 };
 
 const deleteOne = async ({
@@ -87,10 +75,8 @@ const deleteOne = async ({
       store: {
         slug,
       },
-      tags: {
-        some: {
-          id,
-        },
+      category: {
+        id,
       },
     },
   });
@@ -98,10 +84,10 @@ const deleteOne = async ({
     set.status = "Precondition Failed";
     throw new CustomError("CANNOT_DELETE");
   }
-  const tag = await database.tag.delete({
+  const category = await database.category.delete({
     where: { id, store: { slug } },
   });
-  return tag;
+  return category;
 };
 
 export default {
@@ -110,6 +96,4 @@ export default {
   deleteOne,
   findManyByStoreSlug,
   findManyByTokenStoreSlug,
-  findManyCategoriesByStoreSlug,
-  findManyDefaultTagsByStoreSlug,
 };

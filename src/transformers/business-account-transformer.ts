@@ -1,10 +1,11 @@
 import _ from "lodash";
 import { BusinessAccount } from "@prisma/client";
-import date from "../libs/date";
+import dateTime from "../libs/date-time";
 
 const accountPublic = (account: BusinessAccount) => {
   const picked = _.pick(account, [
     "id",
+    "shortId",
     "firstName",
     "lastName",
     "email",
@@ -15,10 +16,10 @@ const accountPublic = (account: BusinessAccount) => {
   ]);
   return {
     ...picked,
-    createdDate: date.dateFormat(account.createdAt),
-    createdDateTime: date.dateTimeFormat(account.createdAt),
-    updatedDate: date.dateFormat(account.updatedAt),
-    updatedDateTime: date.dateTimeFormat(account.updatedAt),
+    createdDate: dateTime.getDateFormat(account.createdAt),
+    createdDateTime: dateTime.getDateTimeFormat(account.createdAt),
+    updatedDate: dateTime.getDateFormat(account.updatedAt),
+    updatedDateTime: dateTime.getDateTimeFormat(account.updatedAt),
   };
 };
 
