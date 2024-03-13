@@ -4,7 +4,7 @@ import store from "./store";
 
 export default new Elysia({ name: "main_router" })
   .group("/api", (app) => app.use(authentication).use(store))
-  .get("/", () => ({ massage: "QuickDine backend service" }))
+  .get("/", () => ({ massage: "Welcome quick dine service" }))
   .get("/ping", () => ({ massage: "pong" }))
   .all("*", () => {
     throw new NotFoundError();
