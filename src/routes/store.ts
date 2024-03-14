@@ -18,51 +18,83 @@ export default new Elysia({
     beforeHandle: shouldBeBusinessUserStore as never,
     transform: inputTransform,
   })
+  .post("/category", categoryController.createOne, {
+    body: validators.categoryCreate,
+    beforeHandle: shouldBeBusinessUserStore as never,
+    transform: inputTransform,
+  })
+  .patch("/category/:id", categoryController.updateOne, {
+    body: validators.categoryUpdate,
+    params: validators.id,
+    beforeHandle: shouldBeBusinessUserStore as never,
+    transform: inputTransform,
+  })
+  .delete("/category/:id", categoryController.deleteOne, {
+    params: validators.id,
+    beforeHandle: shouldBeBusinessUserStore as never,
+    transform: inputTransform,
+  })
   .get("/products", categoryController.findManyByTokenStoreSlug, {
     beforeHandle: shouldBeBusinessUserStore as never,
     transform: inputTransform,
   })
-  .group(
-    "/:slug",
-    {
-      params: validators.storeSlug,
-      transform: inputTransform,
-    },
-    (app) =>
-      app
-        .get("/", storeController.storeBySlug)
-        .get("/products", productController.findManyByStoreSlug)
-        .post("/product", productController.createOne, {
-          body: validators.productCreate,
-          beforeHandle: shouldBeBusinessUserStore as never,
-          transform: inputTransform,
-        })
-        .put("/product", productController.updateOne, {
-          body: validators.productUpdate,
-          params: validators.id,
-          beforeHandle: shouldBeBusinessUserStore as never,
-          transform: inputTransform,
-        })
-        .delete("/product", productController.deleteOne, {
-          params: validators.id,
-          beforeHandle: shouldBeBusinessUserStore as never,
-          transform: inputTransform,
-        })
-        .get("/categories", categoryController.findManyByStoreSlug)
-        .post("/category", categoryController.createOne, {
-          body: validators.categoryCreate,
-          beforeHandle: shouldBeBusinessUserStore as never,
-          transform: inputTransform,
-        })
-        .put("/category", categoryController.updateOne, {
-          body: validators.categoryUpdate,
-          params: validators.id,
-          beforeHandle: shouldBeBusinessUserStore as never,
-          transform: inputTransform,
-        })
-        .delete("/category", categoryController.deleteOne, {
-          params: validators.id,
-          beforeHandle: shouldBeBusinessUserStore as never,
-          transform: inputTransform,
-        })
-  );
+  .post("/product", productController.createOne, {
+    body: validators.productCreate,
+    beforeHandle: shouldBeBusinessUserStore as never,
+    transform: inputTransform,
+  })
+  .patch("/product/:id", productController.updateOne, {
+    body: validators.productUpdate,
+    params: validators.id,
+    beforeHandle: shouldBeBusinessUserStore as never,
+    transform: inputTransform,
+  })
+  .delete("/product/:id", productController.deleteOne, {
+    params: validators.id,
+    beforeHandle: shouldBeBusinessUserStore as never,
+    transform: inputTransform,
+  });
+// .group(
+//   "/:slug",
+//   {
+//     params: validators.storeSlug,
+//     transform: inputTransform,
+//   },
+//   (app) =>
+//     app
+//       .get("/", storeController.storeBySlug)
+//       .get("/products", productController.findManyByStoreSlug)
+//       .post("/product", productController.createOne, {
+//         body: validators.productCreate,
+//         beforeHandle: shouldBeBusinessUserStore as never,
+//         transform: inputTransform,
+//       })
+//       .put("/product", productController.updateOne, {
+//         body: validators.productUpdate,
+//         params: validators.id,
+//         beforeHandle: shouldBeBusinessUserStore as never,
+//         transform: inputTransform,
+//       })
+//       .delete("/product", productController.deleteOne, {
+//         params: validators.id,
+//         beforeHandle: shouldBeBusinessUserStore as never,
+//         transform: inputTransform,
+//       })
+//       .get("/categories", categoryController.findManyByStoreSlug)
+//       .post("/category", categoryController.createOne, {
+//         body: validators.categoryCreate,
+//         beforeHandle: shouldBeBusinessUserStore as never,
+//         transform: inputTransform,
+//       })
+//       .put("/category/:id", categoryController.updateOne, {
+//         body: validators.categoryUpdate,
+//         params: validators.id,
+//         beforeHandle: shouldBeBusinessUserStore as never,
+//         transform: inputTransform,
+//       })
+//       .delete("/category", categoryController.deleteOne, {
+//         params: validators.id,
+//         beforeHandle: shouldBeBusinessUserStore as never,
+//         transform: inputTransform,
+//       })
+// );

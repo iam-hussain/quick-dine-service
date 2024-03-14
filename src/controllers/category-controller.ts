@@ -17,7 +17,7 @@ const findManyByTokenStoreSlug = async ({ token }: HandlerProps) => {
   }
 
   const categories = await categoryService.findManyByStoreSlug(
-    (token.decoded?.store as string) || ""
+    token.decoded?.store
   );
   return categories;
 };
@@ -44,17 +44,22 @@ const createOne = async ({
 };
 
 const updateOne = async ({
-  params: { slug, id },
+  token,
+  params: { id },
   body,
 }: HandlerProps & {
   params: typeof validators.storeSlug.static & typeof validators.id.static;
   body: typeof validators.categoryUpdate.static;
 }) => {
+  if (typeof token.decoded === "boolean") {
+    return {};
+  }
+
   const category = await database.category.update({
     where: {
-      id,
+      shortId: id,
       store: {
-        slug,
+        slug: token.decoded.store,
       },
     },
     data: {
@@ -65,18 +70,22 @@ const updateOne = async ({
 };
 
 const deleteOne = async ({
-  params: { slug, id },
+  token,
+  params: { id },
   set,
 }: HandlerProps & {
   params: typeof validators.storeSlug.static & typeof validators.id.static;
 }) => {
+  if (typeof token.decoded === "boolean") {
+    return {};
+  }
   const history = await database.product.count({
     where: {
       store: {
-        slug,
+        slug: token.decoded.store,
       },
       category: {
-        id,
+        shortId: id,
       },
     },
   });
@@ -85,7 +94,10 @@ const deleteOne = async ({
     throw new CustomError("CANNOT_DELETE");
   }
   const category = await database.category.delete({
-    where: { id, store: { slug } },
+    where: {
+      shortId: id,
+      store: { slug: token.decoded.store },
+    },
   });
   return category;
 };

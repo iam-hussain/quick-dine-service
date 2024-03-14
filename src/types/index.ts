@@ -66,7 +66,7 @@ export type HTTPStatusName = keyof typeof StatusMap;
 
 export type JWT_OBJECT = {
   username: string;
-  store?: string;
+  store: string;
   type: "BUSINESS" | "PERSONAL";
 };
 

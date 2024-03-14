@@ -14,14 +14,18 @@ const app = new Elysia()
   .use(staticPlugin())
   .use(swagger())
   .use(jwtHandler)
-  .use(routes)
   .error({
     CustomError,
     AuthenticationError,
   })
   .onRequest(({ request }) => {
-    logger.info(`${request.method} || ${request.url}`);
+    logger.info(
+      `${request.method} || ${request.url} || ${JSON.stringify(
+        request.body
+      )} || ${request.mode}`
+    );
   })
+  .use(routes)
   .mapResponse(({ response, set }) => {
     const isJson = typeof response === "object";
 

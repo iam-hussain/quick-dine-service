@@ -39,6 +39,7 @@ const signIn = async ({
   const tokenData: JWT_OBJECT = {
     type: "BUSINESS",
     username: user.username,
+    store: "",
   };
 
   if (stores.length === 1) {
