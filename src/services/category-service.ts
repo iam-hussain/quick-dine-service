@@ -7,6 +7,11 @@ const findManyByStoreSlug = (slug: string) => {
         slug,
       },
     },
+    include: {
+      _count: {
+        select: { products: true },
+      },
+    },
   });
 };
 
