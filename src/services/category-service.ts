@@ -12,6 +12,9 @@ const findManyByStoreSlug = (slug: string) => {
         select: { products: true },
       },
     },
+    orderBy: {
+      createdAt: "desc",
+    },
   });
 };
 

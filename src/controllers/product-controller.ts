@@ -4,6 +4,7 @@ import validators from "../validators";
 import productService from "../services/product-service";
 import _ from "lodash";
 import idGenerator from "../libs/id-generator";
+import categoryTransformer from "../transformers/category-transformer";
 
 const findManyByStoreSlug = async ({
   params: { slug },

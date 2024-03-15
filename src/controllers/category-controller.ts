@@ -3,6 +3,7 @@ import { HandlerProps } from "../types";
 import validators from "../validators";
 import categoryService from "../services/category-service";
 import idGenerator from "../libs/id-generator";
+import categoryTransformer from "../transformers/category-transformer";
 
 const findManyByStoreSlug = async ({
   params: { slug },
@@ -19,7 +20,7 @@ const findManyByTokenStoreSlug = async ({ token }: HandlerProps) => {
   const categories = await categoryService.findManyByStoreSlug(
     token.decoded?.store
   );
-  return categories;
+  return categoryTransformer.categoriesPublic(categories);
 };
 
 const createOne = async ({

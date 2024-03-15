@@ -23,7 +23,7 @@ export default new Elysia({
     beforeHandle: shouldBeBusinessUserStore as never,
     transform: inputTransform,
   })
-  .post("/category/:id", categoryController.updateOne, {
+  .patch("/category/:id", categoryController.updateOne, {
     body: validators.categoryUpdate,
     params: validators.id,
     beforeHandle: shouldBeBusinessUserStore as never,
