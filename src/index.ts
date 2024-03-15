@@ -12,13 +12,7 @@ const app = new Elysia()
   .use(helmet())
   .use(
     cors({
-      origin: true,
-      methods: true,
-      allowedHeaders: "*",
-      exposedHeaders: "*",
-      credentials: false,
-      maxAge: 5,
-      preflight: true,
+      methods: "*",
     })
   )
   .use(staticPlugin())
@@ -29,6 +23,9 @@ const app = new Elysia()
     AuthenticationError,
   })
   .onRequest(({ request }) => {
+    console.log(
+      JSON.stringify({ request: { ...request }, head: request.headers })
+    );
     logger.info(
       `${request.method} || ${request.url} || ${JSON.stringify(
         request.body
@@ -45,6 +42,9 @@ const app = new Elysia()
 
     return new Response(Bun.gzipSync(new TextEncoder().encode(text)), {
       headers: {
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Headers":
+          "Origin, X-Requested-With, Content-Type, Accept",
         "Content-Type": `${
           isJson ? "application/json" : "text/plain"
         }; charset=utf-8`,
