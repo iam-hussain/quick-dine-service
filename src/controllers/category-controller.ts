@@ -23,19 +23,23 @@ const findManyByTokenStoreSlug = async ({ token }: HandlerProps) => {
 };
 
 const createOne = async ({
-  params: { slug },
+  token,
   body,
 }: HandlerProps & {
   params: typeof validators.storeSlug.static;
   body: typeof validators.categoryCreate.static;
 }) => {
+  if (typeof token.decoded === "boolean") {
+    return {};
+  }
+
   const category = await database.category.create({
     data: {
       ...body,
       shortId: idGenerator.generateShortID(),
       store: {
         connect: {
-          slug,
+          slug: token.decoded.store,
         },
       },
     },

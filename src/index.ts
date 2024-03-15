@@ -10,7 +10,17 @@ import routes from "./routes";
 
 const app = new Elysia()
   .use(helmet())
-  .use(cors())
+  .use(
+    cors({
+      origin: true,
+      methods: true,
+      allowedHeaders: "*",
+      exposedHeaders: "*",
+      credentials: false,
+      maxAge: 5,
+      preflight: true,
+    })
+  )
   .use(staticPlugin())
   .use(swagger())
   .use(jwtHandler)
