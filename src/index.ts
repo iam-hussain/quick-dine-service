@@ -12,6 +12,7 @@ const app = new Elysia()
   .use(helmet())
   .use(
     cors({
+      origin: true,
       methods: "*",
     })
   )

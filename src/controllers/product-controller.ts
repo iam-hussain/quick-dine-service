@@ -34,11 +34,11 @@ const createOne = async ({
   if (typeof token.decoded === "boolean") {
     throw new AuthenticationError("INVALID_TOKEN");
   }
+  const { categoryId, ...props } = body;
 
   const product = await database.product.create({
     data: {
-      name: body.name,
-      deck: body.deck,
+      ...props,
       shortId: idGenerator.generateShortID(),
       store: {
         connect: {
@@ -47,7 +47,7 @@ const createOne = async ({
       },
       category: {
         connect: {
-          id: body.categoryId,
+          shortId: categoryId,
         },
       },
     },
@@ -67,7 +67,7 @@ const updateOne = async ({
   if (typeof token.decoded === "boolean") {
     throw new AuthenticationError("INVALID_TOKEN");
   }
-
+  const { categoryId, ...props } = body;
   const products = await database.product.update({
     where: {
       shortId: id,
@@ -76,7 +76,12 @@ const updateOne = async ({
       },
     },
     data: {
-      ...body,
+      ...props,
+      category: {
+        connect: {
+          shortId: body.categoryId,
+        },
+      },
     },
   });
 
@@ -126,7 +131,6 @@ const deleteOne = async ({
       },
     },
   });
-  return product;
   return product;
 };
 
