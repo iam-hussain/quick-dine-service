@@ -34,7 +34,7 @@ export default new Elysia({
     beforeHandle: shouldBeBusinessUserStore as never,
     transform: inputTransform,
   })
-  .get("/products", categoryController.findManyByTokenStoreSlug, {
+  .get("/products", productController.findManyByTokenStoreSlug, {
     beforeHandle: shouldBeBusinessUserStore as never,
     transform: inputTransform,
   })

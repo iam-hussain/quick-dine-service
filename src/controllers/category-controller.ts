@@ -1,4 +1,4 @@
-import { CustomError } from "../libs/custom-error";
+import { AuthenticationError, CustomError } from "../libs/custom-error";
 import { HandlerProps } from "../types";
 import validators from "../validators";
 import categoryService from "../services/category-service";
@@ -27,11 +27,10 @@ const createOne = async ({
   token,
   body,
 }: HandlerProps & {
-  params: typeof validators.storeSlug.static;
   body: typeof validators.categoryCreate.static;
 }) => {
   if (typeof token.decoded === "boolean") {
-    return {};
+    throw new AuthenticationError("INVALID_TOKEN");
   }
 
   const category = await database.category.create({
@@ -53,11 +52,11 @@ const updateOne = async ({
   params: { id },
   body,
 }: HandlerProps & {
-  params: typeof validators.storeSlug.static & typeof validators.id.static;
+  params: typeof validators.id.static;
   body: typeof validators.categoryUpdate.static;
 }) => {
   if (typeof token.decoded === "boolean") {
-    return {};
+    throw new AuthenticationError("INVALID_TOKEN");
   }
 
   const category = await database.category.update({
@@ -82,16 +81,14 @@ const deleteOne = async ({
   params: typeof validators.storeSlug.static & typeof validators.id.static;
 }) => {
   if (typeof token.decoded === "boolean") {
-    return {};
+    throw new AuthenticationError("INVALID_TOKEN");
   }
   const history = await database.product.count({
     where: {
       store: {
         slug: token.decoded.store,
       },
-      category: {
-        shortId: id,
-      },
+      categoryId: id,
     },
   });
   if (history > 0) {

@@ -74,12 +74,14 @@ async function main() {
 
   const store = await prisma.store.create({
     data: {
+      shortId: idGenerator.generateShortID(),
       prefix: "ac",
       name: "A Canteen",
       slug: "a-canteen",
       tables: 5,
       addresses: {
         create: {
+          shortId: idGenerator.generateShortID(),
           line1: "New street",
           state: "Tamil Nadu",
           county: "India",
@@ -90,31 +92,31 @@ async function main() {
     },
   });
 
-  const storeId = store.id;
+  const storeId = store.shortId;
   await prisma.businessAccountsOnStores.createMany({
     data: [
       {
-        accountId: alice.id,
+        accountId: alice.shortId,
         administer: true,
         storeId,
       },
       {
-        accountId: bob.id,
+        accountId: bob.shortId,
         administer: false,
         storeId,
       },
       {
-        accountId: charlie.id,
+        accountId: charlie.shortId,
         administer: false,
         storeId,
       },
       {
-        accountId: danny.id,
+        accountId: danny.shortId,
         administer: false,
         storeId,
       },
       {
-        accountId: elena.id,
+        accountId: elena.shortId,
         administer: false,
         storeId,
       },
@@ -148,7 +150,7 @@ async function main() {
       name: "Briyani",
       deck: "The Special Briyani pot",
       position: 1,
-      imageId: image1.id,
+      imageId: image1.shortId,
       storeId,
       shortId: idGenerator.generateShortID(),
       products: {
@@ -179,7 +181,7 @@ async function main() {
       deck: "The Delicious Dessert",
       position: 2,
       storeId,
-      imageId: image2.id,
+      imageId: image2.shortId,
       shortId: idGenerator.generateShortID(),
       products: {
         create: [

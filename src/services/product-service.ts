@@ -8,7 +8,12 @@ const findManyByStoreSlug = (slug: string) => {
       },
     },
     include: {
-      category: true,
+      category: {
+        select: {
+          name: true,
+          shortId: true,
+        },
+      },
     },
   });
 };

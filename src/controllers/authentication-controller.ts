@@ -34,13 +34,15 @@ const signIn = async ({
     throw new CustomError("INVALID_PASSWORD");
   }
 
-  const stores = await storeService.findByBusAccount(user.id);
+  const stores = await storeService.findByBusAccount(user.shortId);
 
   const tokenData: JWT_OBJECT = {
     type: "BUSINESS",
     username: user.username,
     store: "",
   };
+
+  console.log({ stores });
 
   if (stores.length === 1) {
     tokenData.store = stores[0].slug;

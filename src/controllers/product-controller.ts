@@ -1,10 +1,11 @@
-import { CustomError } from "../libs/custom-error";
+import { AuthenticationError, CustomError } from "../libs/custom-error";
 import { HandlerProps } from "../types";
 import validators from "../validators";
 import productService from "../services/product-service";
 import _ from "lodash";
 import idGenerator from "../libs/id-generator";
 import categoryTransformer from "../transformers/category-transformer";
+import productTransformer from "../transformers/product-transformer";
 
 const findManyByStoreSlug = async ({
   params: { slug },
@@ -18,19 +19,22 @@ const findManyByTokenStoreSlug = async ({ token }: HandlerProps) => {
     return [];
   }
 
-  const categories = await productService.findManyByStoreSlug(
-    (token.decoded?.store as string) || ""
+  const products = await productService.findManyByStoreSlug(
+    token.decoded.store
   );
-  return categories;
+  return productTransformer.products(products);
 };
 
 const createOne = async ({
-  params: { slug },
+  token,
   body,
 }: HandlerProps & {
-  params: typeof validators.storeSlug.static;
   body: typeof validators.productCreate.static;
 }) => {
+  if (typeof token.decoded === "boolean") {
+    throw new AuthenticationError("INVALID_TOKEN");
+  }
+
   const product = await database.product.create({
     data: {
       name: body.name,
@@ -38,7 +42,7 @@ const createOne = async ({
       shortId: idGenerator.generateShortID(),
       store: {
         connect: {
-          slug,
+          slug: token.decoded.store,
         },
       },
       category: {
@@ -53,17 +57,23 @@ const createOne = async ({
 };
 
 const updateOne = async ({
-  params: { slug, id },
+  token,
+  params: { id },
   body,
-  set,
 }: HandlerProps & {
-  params: typeof validators.storeSlug.static & typeof validators.id.static;
+  params: typeof validators.id.static;
   body: typeof validators.productUpdate.static;
 }) => {
+  if (typeof token.decoded === "boolean") {
+    throw new AuthenticationError("INVALID_TOKEN");
+  }
+
   const products = await database.product.update({
     where: {
-      id,
-      store: { slug },
+      shortId: id,
+      store: {
+        slug: token.decoded.store,
+      },
     },
     data: {
       ...body,
@@ -74,42 +84,49 @@ const updateOne = async ({
 };
 
 const deleteOne = async ({
-  params: { slug, id },
+  token,
+  params: { id },
   set,
 }: HandlerProps & {
-  params: typeof validators.storeSlug.static & typeof validators.id.static;
+  params: typeof validators.id.static;
 }) => {
+  if (typeof token.decoded === "boolean") {
+    throw new AuthenticationError("INVALID_TOKEN");
+  }
+
   const history = await database.item.count({
     where: {
       productId: id,
       store: {
-        slug,
+        slug: token.decoded.store,
       },
     },
   });
-  if (history === 0) {
-    const product = await database.product.delete({
-      where: {
-        id,
-        store: {
-          slug,
-        },
-      },
-    });
-    return product;
+  if (history > 0) {
+    set.status = "Precondition Failed";
+    throw new CustomError("CANNOT_DELETE");
   }
-  const product = await database.product.update({
+  // const product = await database.product.update({
+  //   where: {
+  //     id,
+  //     store: {
+  //       slug: token.decoded.store,
+  //     },
+  //   },
+  //   data: {
+  //     deleted: true,
+  //     deletedAt: new Date(),
+  //   },
+  // });
+  const product = await database.product.delete({
     where: {
-      id,
+      shortId: id,
       store: {
-        slug,
+        slug: token.decoded.store,
       },
     },
-    data: {
-      deleted: true,
-      deletedAt: new Date(),
-    },
   });
+  return product;
   return product;
 };
 
