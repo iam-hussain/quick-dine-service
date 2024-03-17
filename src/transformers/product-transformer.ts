@@ -1,8 +1,9 @@
 import _ from "lodash";
-import { Category, PRODUCT_TYPE, Product, Store } from "@prisma/client";
+import { Category, Image, PRODUCT_TYPE, Product, Store } from "@prisma/client";
 import dateTime from "../libs/date-time";
 import categoryService from "../services/category-service";
 import productService from "../services/product-service";
+import imageTransformer from "./image-transformer";
 
 const typeMap: { [key in PRODUCT_TYPE]: string } = {
   VEG: "Veg",
@@ -12,6 +13,7 @@ const typeMap: { [key in PRODUCT_TYPE]: string } = {
 
 const productTable = (
   product: Product & {
+    images: Image[];
     category: {
       shortId: string;
       name: string;
@@ -27,12 +29,14 @@ const productTable = (
     "outOfStock",
     "type",
   ]);
+
   return {
     ...picked,
     formattedPrice: product.price.toLocaleString("en-IN", {
       style: "currency",
       currency: "INR",
     }),
+    image: imageTransformer.images(product.images),
     foodType: typeMap[product.type],
     categoryName: product?.category?.name,
     categoryId: product?.category?.shortId,

@@ -2,6 +2,7 @@ import _ from "lodash";
 import { Category, Store } from "@prisma/client";
 import dateTime from "../libs/date-time";
 import categoryService from "../services/category-service";
+import sorts from "../libs/sorts";
 
 const categoryPublic = (
   category: Category & {
@@ -32,7 +33,8 @@ const categoryPublic = (
 const categoriesPublic = (
   categories: Awaited<ReturnType<typeof categoryService.findManyByStoreSlug>>
 ) => {
-  return _.sortBy(categories.map(categoryPublic), "position");
+  const data = categories.map(categoryPublic);
+  return data.sort(sorts.zeroLastSortPosition);
 };
 
 export default {

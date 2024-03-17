@@ -192,7 +192,7 @@ model Product {
   price      Float        @default(0)
   outOfStock Boolean      @default(false)
   type       PRODUCT_TYPE @default(NON_VEG)
-  image      Image[]
+  images     Image[]
   store      Store        @relation(fields: [storeId], references: [shortId])
   storeId    String
   category   Category?    @relation(fields: [categoryId], references: [shortId])

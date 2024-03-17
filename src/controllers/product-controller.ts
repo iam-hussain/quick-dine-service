@@ -22,6 +22,7 @@ const findManyByTokenStoreSlug = async ({ token }: HandlerProps) => {
   const products = await productService.findManyByStoreSlug(
     token.decoded.store
   );
+
   return productTransformer.products(products);
 };
 
