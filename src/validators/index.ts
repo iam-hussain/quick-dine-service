@@ -84,7 +84,7 @@ const storeAdditionalUpdate = t.Object({
         t.Object({
           key: t.String(),
           name: t.String(),
-          value: t.Integer(),
+          value: t.Number(),
           printName: t.Optional(t.String()),
           position: t.Optional(t.Integer()),
           type: t.Optional(t.Enum(NumberType)),
@@ -98,7 +98,7 @@ const storeAdditionalUpdate = t.Object({
         t.Object({
           key: t.String(),
           name: t.String(),
-          value: t.Integer(),
+          value: t.Number(),
           printName: t.Optional(t.String()),
           type: t.Optional(t.String()),
         })

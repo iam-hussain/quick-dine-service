@@ -80,7 +80,13 @@ const mergeStoreAdditional = (
   a: StoreAdditionalType,
   b: Partial<StoreAdditionalType>
 ): StoreAdditionalType => {
-  return _.mergeWith(a, b, mergeArrays);
+  const data = _.mergeWith(a, b, mergeArrays);
+  return {
+    ...data,
+    table: _.sortBy(_.unionBy(data.table.reverse(), "key"), "position"),
+    tax: _.sortBy(_.unionBy(data.tax.reverse(), "key"), "position"),
+    discounts: _.sortBy(_.unionBy(data.discounts.reverse(), "key"), "position"),
+  };
 };
 
 const getStoreAdditional = (
@@ -116,7 +122,7 @@ const store = (store: Store) => {
   ]);
   return {
     ...picked,
-    ...getStoreAdditional(store.additional as any),
+    additional: getStoreAdditional(store.additional as any),
     createdDate: dateTime.getDateFormat(store.createdAt),
     createdDateTime: dateTime.getDateTimeFormat(store.createdAt),
     updatedDate: dateTime.getDateFormat(store.updatedAt),
