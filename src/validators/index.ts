@@ -9,6 +9,7 @@ enum FoodType {
 enum NumberType {
   VALUE = "VALUE",
   PERCENTAGE = "PERCENTAGE",
+  VALUE_COUNT = "VALUE_COUNT",
 }
 
 const id = t.Object({

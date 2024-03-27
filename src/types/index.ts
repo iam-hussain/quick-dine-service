@@ -93,7 +93,7 @@ export type HandlerProps = {
   };
 };
 
-type NumberType = "VALUE" | "PERCENTAGE";
+type NumberType = "VALUE" | "PERCENTAGE" | "VALUE_COUNT";
 
 export type StoreAdditionalType = {
   table: {
