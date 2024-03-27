@@ -5,6 +5,12 @@ enum FoodType {
   VEG = "VEG",
   VEGAN = "VEGAN",
 }
+
+enum NumberType {
+  VALUE = "VALUE",
+  PERCENTAGE = "PERCENTAGE",
+}
+
 const id = t.Object({
   id: t.String(),
 });
@@ -47,6 +53,60 @@ const categoryUpdate = t.Object({
   position: t.Optional(t.Integer()),
 });
 
+const storeAdditionalUpdate = t.Object({
+  packing: t.Optional(
+    t.Object({
+      type: t.Optional(t.Enum(NumberType)),
+      value: t.Number(),
+    })
+  ),
+  delivery: t.Optional(
+    t.Object({
+      type: t.Optional(t.Enum(NumberType)),
+      value: t.Number(),
+    })
+  ),
+  table: t.Optional(
+    t.Array(
+      t.Optional(
+        t.Object({
+          key: t.String(),
+          name: t.String(),
+          printName: t.Optional(t.String()),
+          position: t.Optional(t.Integer()),
+        })
+      )
+    )
+  ),
+  tax: t.Optional(
+    t.Array(
+      t.Optional(
+        t.Object({
+          key: t.String(),
+          name: t.String(),
+          value: t.Integer(),
+          printName: t.Optional(t.String()),
+          position: t.Optional(t.Integer()),
+          type: t.Optional(t.Enum(NumberType)),
+        })
+      )
+    )
+  ),
+  discounts: t.Optional(
+    t.Array(
+      t.Optional(
+        t.Object({
+          key: t.String(),
+          name: t.String(),
+          value: t.Integer(),
+          printName: t.Optional(t.String()),
+          type: t.Optional(t.String()),
+        })
+      )
+    )
+  ),
+});
+
 export default {
   id,
   signIn,
@@ -55,4 +115,5 @@ export default {
   productUpdate,
   categoryCreate,
   categoryUpdate,
+  storeAdditionalUpdate,
 };

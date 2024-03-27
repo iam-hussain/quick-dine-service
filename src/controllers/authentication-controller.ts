@@ -52,9 +52,9 @@ const signIn = async ({
     access_token: await jwt.sign(tokenData),
     includes_store: stores.length === 1,
     current_store:
-      stores.length === 1 ? storeTransformer.storePublic(stores[0]) : null,
+      stores.length === 1 ? storeTransformer.store(stores[0]) : null,
     user: businessAccountTransformer.accountPublic(user),
-    stores: storeTransformer.storesPublic(stores),
+    stores: storeTransformer.stores(stores),
   };
 };
 

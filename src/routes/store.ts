@@ -14,6 +14,11 @@ export default new Elysia({
     beforeHandle: shouldBeBusinessUserStore as never,
     transform: inputTransform,
   })
+  .patch("/additional", storeController.updateAdditional, {
+    body: validators.storeAdditionalUpdate,
+    beforeHandle: shouldBeBusinessUserStore as never,
+    transform: inputTransform,
+  })
   .get("/categories", categoryController.findManyByTokenStoreSlug, {
     beforeHandle: shouldBeBusinessUserStore as never,
     transform: inputTransform,

@@ -1,4 +1,4 @@
-import { CustomError } from "../libs/custom-error";
+import { AuthenticationError, CustomError } from "../libs/custom-error";
 import { HandlerProps } from "../types";
 import validators from "../validators";
 import storeService from "../services/store-service";
@@ -13,23 +13,57 @@ const storeBySlug = async ({
     set.status = "Precondition Failed";
     throw new CustomError("INVALID_STORE");
   }
-  return storeTransformer.storePublic(store);
+  return storeTransformer.store(store);
 };
 
 const storeByToken = async ({ token, set }: HandlerProps) => {
-  console.log({ token });
   if (typeof token.decoded === "boolean") {
-    return {};
+    throw new AuthenticationError("INVALID_TOKEN");
   }
   const store = await storeService.findBySlug(token.decoded?.store as string);
   if (!store) {
     set.status = "Precondition Failed";
     throw new CustomError("INVALID_STORE");
   }
-  return storeTransformer.storePublic(store);
+  return storeTransformer.store(store);
+};
+
+const updateAdditional = async ({
+  token,
+  set,
+  body,
+}: HandlerProps & {
+  body: typeof validators.storeAdditionalUpdate.static;
+}) => {
+  if (typeof token.decoded === "boolean") {
+    throw new AuthenticationError("INVALID_TOKEN");
+  }
+  const store = await storeService.findBySlug(token.decoded?.store as string);
+
+  if (!store) {
+    set.status = "Precondition Failed";
+    throw new CustomError("INVALID_STORE");
+  }
+
+  const reqBody = storeTransformer.validateStoreAdditional(body as any);
+  const storeData = storeTransformer.getStoreAdditional(
+    store?.additional as any
+  );
+  const merged = storeTransformer.mergeStoreAdditional(storeData, reqBody);
+
+  const updated = await database.store.update({
+    where: {
+      shortId: store.shortId,
+    },
+    data: {
+      additional: merged,
+    },
+  });
+  return updated;
 };
 
 export default {
   storeBySlug,
   storeByToken,
+  updateAdditional,
 };
