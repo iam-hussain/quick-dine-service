@@ -14,7 +14,7 @@ const inputTransform = ({ body, params }: any) => {
   if (body?.delivery?.value) {
     body.delivery.value = Number(body.delivery?.value);
   }
-  console.log({ body });
+
   if (body?.table && Array.isArray(body?.table) && body?.table.length) {
     body.table = body.table.map((e: { position: any }) => ({
       ...e,
