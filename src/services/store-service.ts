@@ -1,11 +1,14 @@
 import database from "../providers/database";
 
-const findByBusAccount = (accountId: string) => {
+const findByBusAccount = (userId: string) => {
   return database.store.findMany({
     where: {
-      consumers: {
+      connections: {
         some: {
-          accountId,
+          user: {
+            shortId: userId,
+            type: "SELLER",
+          },
         },
       },
     },
@@ -19,19 +22,17 @@ export const findStoreDeep = (slug: string) => {
     },
     include: {
       products: true,
-      addresses: true,
-      images: true,
     },
   });
 };
 
-export const findBySlugAndBusAccount = (slug: string, accountId: string) => {
+export const findBySlugAndBusAccount = (slug: string, userId: string) => {
   return database.store.findUnique({
     where: {
       slug,
-      consumers: {
+      connections: {
         some: {
-          accountId,
+          userId,
         },
       },
     },
@@ -48,6 +49,7 @@ export const findBySlug = (slug: string) => {
 
 export default {
   findBySlug,
+  findStoreDeep,
   findByBusAccount,
   findBySlugAndBusAccount,
 };

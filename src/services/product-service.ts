@@ -14,7 +14,6 @@ const findManyByStoreSlug = (slug: string) => {
           shortId: true,
         },
       },
-      images: true,
     },
   });
 };

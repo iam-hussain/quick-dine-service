@@ -1,10 +1,11 @@
 import _ from "lodash";
-import { BusinessAccount } from "@prisma/client";
+import { User } from "@prisma/client";
 import dateTime from "../libs/date-time";
 
-const accountPublic = (account: BusinessAccount) => {
+const userPublic = (account: User) => {
   const picked = _.pick(account, [
     "id",
+    "type",
     "shortId",
     "firstName",
     "lastName",
@@ -24,5 +25,5 @@ const accountPublic = (account: BusinessAccount) => {
 };
 
 export default {
-  accountPublic,
+  userPublic,
 };

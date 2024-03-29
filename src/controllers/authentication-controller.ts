@@ -1,8 +1,8 @@
 import { CustomError } from "../libs/custom-error";
 import { verifyPasswordHash } from "../libs/hash";
-import businessAccountService from "../services/business-account-service";
+import userService from "../services/user-service";
 import storeService from "../services/store-service";
-import businessAccountTransformer from "../transformers/business-account-transformer";
+import userTransformer from "../transformers/user-transformer";
 import storeTransformer from "../transformers/store-transformer";
 import { HandlerProps, JWT_OBJECT } from "../types";
 import validators from "../validators";
@@ -12,7 +12,7 @@ const signIn = async ({
   set,
   jwt,
 }: HandlerProps & { body: typeof validators.signIn.static }) => {
-  const user = await businessAccountService.findByEmail(body.email);
+  const user = await userService.findByEmail(body.email);
   if (!user) {
     set.status = "Precondition Failed";
     throw new CustomError("USER_NOT_FOUND");
@@ -53,7 +53,7 @@ const signIn = async ({
     includes_store: stores.length === 1,
     current_store:
       stores.length === 1 ? storeTransformer.store(stores[0]) : null,
-    user: businessAccountTransformer.accountPublic(user),
+    user: userTransformer.userPublic(user),
     stores: storeTransformer.stores(stores),
   };
 };

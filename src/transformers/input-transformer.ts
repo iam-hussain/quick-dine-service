@@ -7,37 +7,26 @@ const inputTransform = ({ body, params }: any) => {
     body.position = Number(body.position);
   }
 
-  if (body?.packing?.value) {
-    body.packing.value = Number(body.packing?.value);
-  }
-
-  if (body?.delivery?.value) {
-    body.delivery.value = Number(body.delivery?.value);
-  }
-
-  if (body?.table && Array.isArray(body?.table) && body?.table.length) {
-    body.table = body.table.map((e: { position: any }) => ({
+  if (body?.tables && Array.isArray(body?.tables) && body?.tables.length) {
+    body.tables = body.tables.map((e: { position: any }) => ({
       ...e,
       position: Number(e.position),
     }));
   }
 
-  if (body?.tax && Array.isArray(body?.tax) && body?.tax.length) {
-    body.tax = body.tax.map((e: { value: any; position: any }) => ({
+  if (body?.taxes && Array.isArray(body?.taxes) && body?.taxes.length) {
+    body.taxes = body.taxes.map((e: { value: any; position: any }) => ({
       ...e,
       value: Number(e.value),
       position: Number(e.position),
     }));
   }
 
-  if (
-    body?.discounts &&
-    Array.isArray(body?.discounts) &&
-    body?.discounts.length
-  ) {
-    body.discounts = body.discounts.map((e: { value: any }) => ({
+  if (body?.fees && Array.isArray(body?.fees) && body?.fees.length) {
+    body.fees = body.fees.map((e: { value: any; position: any }) => ({
       ...e,
       value: Number(e.value),
+      position: Number(e.position),
     }));
   }
 };

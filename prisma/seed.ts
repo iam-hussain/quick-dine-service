@@ -12,9 +12,10 @@ prisma.$on("query" as never, (e: any) => {
 });
 
 async function main() {
-  const alice = await prisma.businessAccount.create({
+  const alice = await prisma.user.create({
     data: {
       shortId: idGenerator.generateShortID(),
+      type: "SELLER",
       firstName: "Alice",
       email: "alice@prisma.io",
       username: "alice",
@@ -24,9 +25,10 @@ async function main() {
     },
   });
 
-  const bob = await prisma.businessAccount.create({
+  const bob = await prisma.user.create({
     data: {
       shortId: idGenerator.generateShortID(),
+      type: "SELLER",
       firstName: "Bob",
       email: "bob@prisma.io",
       username: "bobs",
@@ -36,9 +38,10 @@ async function main() {
     },
   });
 
-  const charlie = await prisma.businessAccount.create({
+  const charlie = await prisma.user.create({
     data: {
       shortId: idGenerator.generateShortID(),
+      type: "SELLER",
       firstName: "Charlie",
       email: "charlie@prisma.io",
       username: "charlie",
@@ -48,9 +51,10 @@ async function main() {
     },
   });
 
-  const danny = await prisma.businessAccount.create({
+  const danny = await prisma.user.create({
     data: {
       shortId: idGenerator.generateShortID(),
+      type: "SELLER",
       firstName: "Danny",
       email: "danny@prisma.io",
       username: "danny",
@@ -60,9 +64,10 @@ async function main() {
     },
   });
 
-  const elena = await prisma.businessAccount.create({
+  const elena = await prisma.user.create({
     data: {
       shortId: idGenerator.generateShortID(),
+      type: "SELLER",
       firstName: "Elena",
       email: "elena@prisma.io",
       username: "elena",
@@ -78,71 +83,115 @@ async function main() {
       prefix: "ac",
       name: "A Canteen",
       slug: "a-canteen",
-      tables: 5,
-      addresses: {
-        create: {
-          shortId: idGenerator.generateShortID(),
-          line1: "New street",
-          state: "Tamil Nadu",
-          county: "India",
-          pincode: "606601",
+      taxes: [
+        {
+          key: "CGST",
+          name: "CGST",
+          printName: "CGST",
+          type: "PERCENTAGE",
+          rate: 5,
+          position: 2,
+        },
+        {
+          key: "SGST",
+          name: "SGST",
+          printName: "SGST",
+          type: "PERCENTAGE",
+          rate: 5,
           position: 1,
         },
+      ],
+      fees: [
+        {
+          DELIVERY: {
+            key: "DELIVERY",
+            name: "DELIVERY",
+            printName: "Delivery",
+            type: "VALUE",
+            rate: 35,
+            position: 2,
+          },
+          PACKING: {
+            key: "PACKING",
+            name: "PACKING",
+            printName: "Packing",
+            type: "VALUE_COUNT",
+            rate: 10,
+            position: 1,
+          },
+        },
+      ],
+      tables: [
+        {
+          key: "T1",
+          name: "T1",
+          printName: "T1",
+          position: 1,
+        },
+        {
+          key: "T2",
+          name: "T2",
+          printName: "T2",
+          position: 2,
+        },
+        {
+          key: "T3",
+          name: "T3",
+          printName: "T3",
+          position: 3,
+        },
+        {
+          key: "T4",
+          name: "T4",
+          printName: "T4",
+          position: 4,
+        },
+      ],
+      address: {
+        line1: "New street",
+        state: "Tamil Nadu",
+        county: "India",
+        pincode: "606601",
       },
+      printHead: ["A CANTEEN FOODS"],
+      printDeck: [
+        "No. 20/10, Gandhi Nagar",
+        "Thiruvannmalai, Tamil Nadu - 606601",
+        "GSTIN: HSU677SHS6D88D0J",
+      ],
+      printFooter: ["Thank you. Visit Again."],
     },
   });
 
   const storeId = store.shortId;
-  await prisma.businessAccountsOnStores.createMany({
+  await prisma.usersOnStores.createMany({
     data: [
       {
-        accountId: alice.shortId,
-        administer: true,
+        userId: alice.shortId,
         storeId,
+        originated: true,
       },
       {
-        accountId: bob.shortId,
-        administer: false,
+        userId: bob.shortId,
         storeId,
+        originated: true,
       },
       {
-        accountId: charlie.shortId,
-        administer: false,
+        userId: charlie.shortId,
         storeId,
+        originated: true,
       },
       {
-        accountId: danny.shortId,
-        administer: false,
+        userId: danny.shortId,
         storeId,
+        originated: true,
       },
       {
-        accountId: elena.shortId,
-        administer: false,
+        userId: elena.shortId,
         storeId,
+        originated: true,
       },
     ],
-  });
-
-  const image1 = await prisma.image.create({
-    data: {
-      shortId: idGenerator.generateShortID(),
-      caption: "Briyani Food",
-      altText: "The Briyani pot",
-      type: "URL",
-      content:
-        "https://images.unsplash.com/photo-1642821373181-696a54913e93?q=80&w=4740&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-    },
-  });
-
-  const image2 = await prisma.image.create({
-    data: {
-      shortId: idGenerator.generateShortID(),
-      caption: "Briyani Food",
-      altText: "The Briyani Food",
-      type: "URL",
-      content:
-        "https://images.unsplash.com/photo-1642821373181-696a54913e93?q=80&w=4740&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-    },
   });
 
   await prisma.category.create({
@@ -150,26 +199,46 @@ async function main() {
       name: "Briyani",
       deck: "The Special Briyani pot",
       position: 1,
-      imageId: image1.shortId,
       storeId,
       shortId: idGenerator.generateShortID(),
       products: {
-        create: {
-          name: "Mutton Briyani",
-          deck: "The Mutton Briyani Pot",
-          price: 350,
-          storeId: storeId,
-          shortId: idGenerator.generateShortID(),
-          image: {
-            create: {
+        createMany: {
+          data: [
+            {
+              name: "Mutton Briyani",
+              deck: "The Mutton Briyani Pot",
+              price: 350,
+              storeId: storeId,
               shortId: idGenerator.generateShortID(),
-              caption: "Mutton Briyani Food",
-              altText: "The Mutton Briyani pot",
-              type: "URL",
-              content:
-                "https://media.istockphoto.com/id/980036908/photo/gosht-or-lamb-biryani-prepared-in-basmati-rice-served-with-yogurt-dip-in-terracotta-bowl.jpg?s=1024x1024&w=is&k=20&c=3ZSUuA6nf9xmdX3pWyTcb7iGTme8HudkXOe3bUJDl-c=",
+              images: [
+                {
+                  caption: "Mutton Briyani Food",
+                  altText: "The Mutton Briyani pot",
+                  type: "URL",
+                  position: 1,
+                  value:
+                    "https://media.istockphoto.com/id/980036908/photo/gosht-or-lamb-biryani-prepared-in-basmati-rice-served-with-yogurt-dip-in-terracotta-bowl.jpg?s=1024x1024&w=is&k=20&c=3ZSUuA6nf9xmdX3pWyTcb7iGTme8HudkXOe3bUJDl-c=",
+                },
+              ],
             },
-          },
+            {
+              name: "Chicken Briyani",
+              deck: "The Chicken Briyani Pot",
+              price: 250,
+              storeId: storeId,
+              shortId: idGenerator.generateShortID(),
+              images: [
+                {
+                  caption: "Briyani Food",
+                  altText: "The Briyani pot",
+                  type: "URL",
+                  position: 1,
+                  value:
+                    "https://images.unsplash.com/photo-1642821373181-696a54913e93?q=80&w=4740&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+                },
+              ],
+            },
+          ],
         },
       },
     },
@@ -181,7 +250,6 @@ async function main() {
       deck: "The Delicious Dessert",
       position: 2,
       storeId,
-      imageId: image2.shortId,
       shortId: idGenerator.generateShortID(),
       products: {
         create: [
@@ -191,16 +259,16 @@ async function main() {
             deck: "Delicious cake with pistachio and raspberries",
             price: 100,
             storeId: storeId,
-            image: {
-              create: {
-                shortId: idGenerator.generateShortID(),
+            images: [
+              {
                 caption: "Raspberries and Pistachio Cake",
                 altText: "Delicious cake with pistachio and raspberries",
                 type: "URL",
-                content:
+                position: 1,
+                value:
                   "https://images.unsplash.com/photo-1565958011703-44f9829ba187?q=80&w=2865&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
               },
-            },
+            ],
           },
           {
             name: "Chocolate Donuts",
@@ -208,16 +276,16 @@ async function main() {
             price: 150,
             storeId: storeId,
             shortId: idGenerator.generateShortID(),
-            image: {
-              create: {
-                shortId: idGenerator.generateShortID(),
+            images: [
+              {
                 caption: "Chocolate Donuts",
                 altText: "Delicious donuts with chocolate",
                 type: "URL",
-                content:
+                position: 1,
+                value:
                   "https://images.unsplash.com/photo-1551106652-a5bcf4b29ab6?q=80&w=2837&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
               },
-            },
+            ],
           },
         ],
       },

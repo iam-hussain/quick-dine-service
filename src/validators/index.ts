@@ -6,10 +6,29 @@ enum FoodType {
   VEGAN = "VEGAN",
 }
 
-enum NumberType {
+enum CalcValueType {
   VALUE = "VALUE",
   PERCENTAGE = "PERCENTAGE",
   VALUE_COUNT = "VALUE_COUNT",
+}
+
+enum ORDER_TYPE {
+  PRE_DINING = "PRE_DINING",
+  DINING = "DINING",
+  TAKE_AWAY = "TAKE_AWAY",
+  PICK_UP = "PICK_UP",
+  DELIVERY = "DELIVERY",
+  PLATFORM = "PLATFORM",
+}
+
+enum ORDER_STATUS {
+  DRAFT = "DRAFT",
+  PLACED = "PLACED",
+  ACCEPTED = "ACCEPTED",
+  PROGRESS = "PROGRESS",
+  READY = "READY",
+  OUT_FOR_DELIVERY = "OUT_FOR_DELIVERY",
+  COMPLETED = "COMPLETED",
 }
 
 const id = t.Object({
@@ -54,20 +73,33 @@ const categoryUpdate = t.Object({
   position: t.Optional(t.Integer()),
 });
 
+const order = t.Object({
+  shortId: t.Optional(t.String()),
+  type: t.Optional(t.Enum(ORDER_TYPE)),
+  status: t.Optional(t.Enum(ORDER_STATUS)),
+  notes: t.Optional(t.String()),
+  tableKey: t.Optional(t.String()),
+  tableName: t.Optional(t.String()),
+  customerId: t.Optional(t.String()),
+  createdId: t.Optional(t.String()),
+});
+
 const storeAdditionalUpdate = t.Object({
-  packing: t.Optional(
-    t.Object({
-      type: t.Optional(t.Enum(NumberType)),
-      value: t.Number(),
-    })
+  fees: t.Optional(
+    t.Array(
+      t.Optional(
+        t.Object({
+          key: t.String(),
+          name: t.String(),
+          rate: t.Number(),
+          printName: t.Optional(t.String()),
+          position: t.Optional(t.Integer()),
+          type: t.Optional(t.Enum(CalcValueType)),
+        })
+      )
+    )
   ),
-  delivery: t.Optional(
-    t.Object({
-      type: t.Optional(t.Enum(NumberType)),
-      value: t.Number(),
-    })
-  ),
-  table: t.Optional(
+  tables: t.Optional(
     t.Array(
       t.Optional(
         t.Object({
@@ -79,29 +111,16 @@ const storeAdditionalUpdate = t.Object({
       )
     )
   ),
-  tax: t.Optional(
+  taxes: t.Optional(
     t.Array(
       t.Optional(
         t.Object({
           key: t.String(),
           name: t.String(),
-          value: t.Number(),
+          rate: t.Number(),
           printName: t.Optional(t.String()),
           position: t.Optional(t.Integer()),
-          type: t.Optional(t.Enum(NumberType)),
-        })
-      )
-    )
-  ),
-  discounts: t.Optional(
-    t.Array(
-      t.Optional(
-        t.Object({
-          key: t.String(),
-          name: t.String(),
-          value: t.Number(),
-          printName: t.Optional(t.String()),
-          type: t.Optional(t.String()),
+          type: t.Optional(t.Enum(CalcValueType)),
         })
       )
     )

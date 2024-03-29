@@ -1,7 +1,6 @@
 import _ from "lodash";
-import { Category, Image, PRODUCT_TYPE, Product, Store } from "@prisma/client";
+import { PRODUCT_TYPE, Product } from "@prisma/client";
 import dateTime from "../libs/date-time";
-import categoryService from "../services/category-service";
 import productService from "../services/product-service";
 import imageTransformer from "./image-transformer";
 
@@ -13,7 +12,6 @@ const typeMap: { [key in PRODUCT_TYPE]: string } = {
 
 const productTable = (
   product: Product & {
-    images: Image[];
     category: {
       shortId: string;
       name: string;

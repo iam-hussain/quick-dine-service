@@ -3,6 +3,7 @@ import { HandlerProps } from "../types";
 import validators from "../validators";
 import storeService from "../services/store-service";
 import storeTransformer from "../transformers/store-transformer";
+import storeAdditionalTransformer from "../transformers/store-additional-transformer";
 
 const storeBySlug = async ({
   params: { slug },
@@ -45,18 +46,29 @@ const updateAdditional = async ({
     throw new CustomError("INVALID_STORE");
   }
 
-  const reqBody = storeTransformer.validateStoreAdditional(body as any);
-  const storeData = storeTransformer.getStoreAdditional(
-    store?.additional as any
+  const reqBody = storeAdditionalTransformer.validateStoreAdditional(
+    body as any
   );
-  const merged = storeTransformer.mergeStoreAdditional(storeData, reqBody);
+  const storeData = storeAdditionalTransformer.getStoreAdditional(store);
+  const data = storeAdditionalTransformer.mergeStoreAdditional(
+    storeData,
+    reqBody
+  );
 
   const updated = await database.store.update({
     where: {
       shortId: store.shortId,
     },
     data: {
-      additional: merged,
+      tables: {
+        set: data.tables as any,
+      },
+      fees: {
+        set: data.fees as any,
+      },
+      taxes: {
+        set: data.taxes as any,
+      },
     },
   });
   return updated;

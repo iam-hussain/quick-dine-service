@@ -102,9 +102,11 @@ const deleteOne = async ({
 
   const history = await database.item.count({
     where: {
-      productId: id,
-      store: {
-        slug: token.decoded.store,
+      product: {
+        id,
+        store: {
+          slug: token.decoded.store,
+        },
       },
     },
   });
@@ -112,18 +114,6 @@ const deleteOne = async ({
     set.status = "Precondition Failed";
     throw new CustomError("CANNOT_DELETE");
   }
-  // const product = await database.product.update({
-  //   where: {
-  //     id,
-  //     store: {
-  //       slug: token.decoded.store,
-  //     },
-  //   },
-  //   data: {
-  //     deleted: true,
-  //     deletedAt: new Date(),
-  //   },
-  // });
   const product = await database.product.delete({
     where: {
       shortId: id,
