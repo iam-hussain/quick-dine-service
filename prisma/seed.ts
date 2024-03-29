@@ -14,6 +14,7 @@ prisma.$on("query" as never, (e: any) => {
 async function main() {
   const alice = await prisma.user.create({
     data: {
+      id: idGenerator.generateShortID(),
       shortId: idGenerator.generateShortID(),
       type: "SELLER",
       firstName: "Alice",
@@ -27,6 +28,7 @@ async function main() {
 
   const bob = await prisma.user.create({
     data: {
+      id: idGenerator.generateShortID(),
       shortId: idGenerator.generateShortID(),
       type: "SELLER",
       firstName: "Bob",
@@ -40,6 +42,7 @@ async function main() {
 
   const charlie = await prisma.user.create({
     data: {
+      id: idGenerator.generateShortID(),
       shortId: idGenerator.generateShortID(),
       type: "SELLER",
       firstName: "Charlie",
@@ -53,6 +56,7 @@ async function main() {
 
   const danny = await prisma.user.create({
     data: {
+      id: idGenerator.generateShortID(),
       shortId: idGenerator.generateShortID(),
       type: "SELLER",
       firstName: "Danny",
@@ -66,6 +70,7 @@ async function main() {
 
   const elena = await prisma.user.create({
     data: {
+      id: idGenerator.generateShortID(),
       shortId: idGenerator.generateShortID(),
       type: "SELLER",
       firstName: "Elena",
@@ -79,6 +84,7 @@ async function main() {
 
   const store = await prisma.store.create({
     data: {
+      id: idGenerator.generateShortID(),
       shortId: idGenerator.generateShortID(),
       prefix: "ac",
       name: "A Canteen",
@@ -161,31 +167,31 @@ async function main() {
     },
   });
 
-  const storeId = store.shortId;
+  const storeId = store.id;
   await prisma.usersOnStores.createMany({
     data: [
       {
-        userId: alice.shortId,
+        userId: alice.id,
         storeId,
         originated: true,
       },
       {
-        userId: bob.shortId,
+        userId: bob.id,
         storeId,
         originated: true,
       },
       {
-        userId: charlie.shortId,
+        userId: charlie.id,
         storeId,
         originated: true,
       },
       {
-        userId: danny.shortId,
+        userId: danny.id,
         storeId,
         originated: true,
       },
       {
-        userId: elena.shortId,
+        userId: elena.id,
         storeId,
         originated: true,
       },
@@ -198,6 +204,7 @@ async function main() {
       deck: "The Special Briyani pot",
       position: 1,
       storeId,
+      id: idGenerator.generateShortID(),
       shortId: idGenerator.generateShortID(),
       products: {
         createMany: {
@@ -207,6 +214,7 @@ async function main() {
               deck: "The Mutton Briyani Pot",
               price: 350,
               storeId: storeId,
+              id: idGenerator.generateShortID(),
               shortId: idGenerator.generateShortID(),
               images: [
                 {
@@ -224,6 +232,7 @@ async function main() {
               deck: "The Chicken Briyani Pot",
               price: 250,
               storeId: storeId,
+              id: idGenerator.generateShortID(),
               shortId: idGenerator.generateShortID(),
               images: [
                 {
@@ -248,10 +257,12 @@ async function main() {
       deck: "The Delicious Dessert",
       position: 2,
       storeId,
+      id: idGenerator.generateShortID(),
       shortId: idGenerator.generateShortID(),
       products: {
         create: [
           {
+            id: idGenerator.generateShortID(),
             shortId: idGenerator.generateShortID(),
             name: "Raspberries and Pistachio Cake",
             deck: "Delicious cake with pistachio and raspberries",
@@ -273,6 +284,7 @@ async function main() {
             deck: "Delicious donuts with chocolate",
             price: 150,
             storeId: storeId,
+            id: idGenerator.generateShortID(),
             shortId: idGenerator.generateShortID(),
             images: [
               {
