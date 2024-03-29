@@ -103,22 +103,20 @@ async function main() {
       ],
       fees: [
         {
-          DELIVERY: {
-            key: "DELIVERY",
-            name: "DELIVERY",
-            printName: "Delivery",
-            type: "VALUE",
-            rate: 35,
-            position: 2,
-          },
-          PACKING: {
-            key: "PACKING",
-            name: "PACKING",
-            printName: "Packing",
-            type: "VALUE_COUNT",
-            rate: 10,
-            position: 1,
-          },
+          key: "DELIVERY",
+          name: "DELIVERY",
+          printName: "Delivery",
+          type: "VALUE",
+          rate: 35,
+          position: 2,
+        },
+        {
+          key: "PACKING",
+          name: "PACKING",
+          printName: "Packing",
+          type: "VALUE_COUNT",
+          rate: 10,
+          position: 1,
         },
       ],
       tables: [

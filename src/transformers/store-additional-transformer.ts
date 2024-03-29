@@ -27,7 +27,7 @@ const getTax = ({
   type?: string;
   position?: number;
 }) => {
-  if (!key || rate || Number.isNaN(rate)) {
+  if (!key || !rate || Number.isNaN(rate)) {
     return null;
   }
   const _type = getNumberType(type);
@@ -59,7 +59,7 @@ const getFee = (
   },
   returnDefault: boolean = false
 ) => {
-  if (!returnDefault && (!name || rate || Number.isNaN(rate))) {
+  if (!returnDefault && (!name || !rate || Number.isNaN(rate))) {
     return null;
   }
   const _type = getNumberType(type);

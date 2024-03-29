@@ -22,9 +22,12 @@ const store = (store: Store) => {
     "fees",
     "extra",
   ]);
+  const { fees, ...extra } =
+    storeAdditionalTransformer.getStoreAdditional(store);
   return {
     ...picked,
-    ...storeAdditionalTransformer.getStoreAdditional(store),
+    ...extra,
+    fees: _.keyBy(store.fees, "key"),
     createdDate: dateTime.getDateFormat(store.createdAt),
     createdDateTime: dateTime.getDateTimeFormat(store.createdAt),
     updatedDate: dateTime.getDateFormat(store.updatedAt),
