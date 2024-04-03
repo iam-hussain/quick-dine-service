@@ -1,4 +1,5 @@
 import moment from "moment-timezone";
+
 moment.tz.setDefault("Asia/Kolkata");
 
 export const getDate = (date: string | Date = new Date()) => {
@@ -17,9 +18,14 @@ export const getIDFormatDate = () => {
   return moment().format("YYMMDD");
 };
 
+export const getTodayStart = (date: string | Date = new Date()) => {
+  return moment(date).startOf("day").utc().toDate();
+};
+
 export default {
   getDate,
   getDateFormat,
   getDateTimeFormat,
   getIDFormatDate,
+  getTodayStart,
 };

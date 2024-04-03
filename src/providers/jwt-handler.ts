@@ -38,7 +38,6 @@ export default new Elysia({ name: "jwt_handler" })
     const value = extractToken({ headers });
     const decoded = await decodeToken({ jwt, token: value });
     const tokenType = decoded ? decoded.type : "";
-    console.log({ decoded, value });
     return {
       token: {
         value,

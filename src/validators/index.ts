@@ -1,11 +1,5 @@
 import { t } from "elysia";
 
-enum FoodType {
-  NON_VEG = "NON_VEG",
-  VEG = "VEG",
-  VEGAN = "VEGAN",
-}
-
 enum CalcValueType {
   VALUE = "VALUE",
   PERCENTAGE = "PERCENTAGE",
@@ -31,6 +25,12 @@ enum ORDER_STATUS {
   COMPLETED = "COMPLETED",
 }
 
+enum PRODUCT_TYPE {
+  VEG = "VEG",
+  NON_VEG = "NON_VEG",
+  VEGAN = "VEGAN",
+}
+
 const id = t.Object({
   id: t.String(),
 });
@@ -47,7 +47,7 @@ const storeSlug = t.Object({
 const productCreate = t.Object({
   name: t.String(),
   deck: t.Optional(t.String()),
-  type: t.Optional(t.Enum(FoodType)),
+  type: t.Optional(t.Enum(PRODUCT_TYPE)),
   price: t.Number(),
   categoryId: t.String(),
 });
@@ -56,7 +56,7 @@ const productUpdate = t.Object({
   name: t.Optional(t.String()),
   deck: t.Optional(t.String()),
   price: t.Optional(t.Number()),
-  type: t.Optional(t.Enum(FoodType)),
+  type: t.Optional(t.Enum(PRODUCT_TYPE)),
   categoryId: t.Optional(t.String()),
   outOfStock: t.Optional(t.Boolean()),
 });
@@ -73,58 +73,83 @@ const categoryUpdate = t.Object({
   position: t.Optional(t.Integer()),
 });
 
-const order = t.Object({
+const items = t.Object({
+  id: t.Optional(t.String()),
+  title: t.Optional(t.String()),
+  note: t.Optional(t.String()),
+  price: t.Optional(t.Number()),
+  type: t.Optional(t.Enum(PRODUCT_TYPE)),
+  quantity: t.Integer(),
+  position: t.Optional(t.Integer()),
+  productId: t.String(),
+});
+
+const fees = t.Optional(
+  t.Array(
+    t.Optional(
+      t.Object({
+        key: t.String(),
+        name: t.String(),
+        rate: t.Number(),
+        printName: t.Optional(t.String()),
+        position: t.Optional(t.Integer()),
+        type: t.Optional(t.Enum(CalcValueType)),
+      })
+    )
+  )
+);
+
+const table = t.Optional(
+  t.Object({
+    key: t.String(),
+    name: t.String(),
+    printName: t.Optional(t.String()),
+    position: t.Optional(t.Integer()),
+  })
+);
+
+const tables = t.Optional(t.Array(table));
+const taxes = t.Optional(
+  t.Array(
+    t.Optional(
+      t.Object({
+        key: t.String(),
+        name: t.String(),
+        rate: t.Number(),
+        printName: t.Optional(t.String()),
+        position: t.Optional(t.Integer()),
+        type: t.Optional(t.Enum(CalcValueType)),
+      })
+    )
+  )
+);
+
+const orderUpsert = t.Object({
   shortId: t.Optional(t.String()),
   type: t.Optional(t.Enum(ORDER_TYPE)),
   status: t.Optional(t.Enum(ORDER_STATUS)),
   notes: t.Optional(t.String()),
-  tableKey: t.Optional(t.String()),
-  tableName: t.Optional(t.String()),
   customerId: t.Optional(t.String()),
   createdId: t.Optional(t.String()),
+  items: t.Array(items),
+  completedAt: t.Optional(t.String()),
+  deliveredAt: t.Optional(t.String()),
+  fees,
+  table,
+  taxes,
 });
 
 const storeAdditionalUpdate = t.Object({
-  fees: t.Optional(
-    t.Array(
-      t.Optional(
-        t.Object({
-          key: t.String(),
-          name: t.String(),
-          rate: t.Number(),
-          printName: t.Optional(t.String()),
-          position: t.Optional(t.Integer()),
-          type: t.Optional(t.Enum(CalcValueType)),
-        })
-      )
-    )
-  ),
-  tables: t.Optional(
-    t.Array(
-      t.Optional(
-        t.Object({
-          key: t.String(),
-          name: t.String(),
-          printName: t.Optional(t.String()),
-          position: t.Optional(t.Integer()),
-        })
-      )
-    )
-  ),
-  taxes: t.Optional(
-    t.Array(
-      t.Optional(
-        t.Object({
-          key: t.String(),
-          name: t.String(),
-          rate: t.Number(),
-          printName: t.Optional(t.String()),
-          position: t.Optional(t.Integer()),
-          type: t.Optional(t.Enum(CalcValueType)),
-        })
-      )
-    )
-  ),
+  fees,
+  tables,
+  taxes,
+});
+
+const orders = t.Object({
+  today: t.Optional(t.Boolean()),
+  skip: t.Optional(t.Integer()),
+  take: t.Optional(t.Integer()),
+  cursor: t.Optional(t.String()),
 });
 
 export default {
@@ -136,4 +161,6 @@ export default {
   categoryCreate,
   categoryUpdate,
   storeAdditionalUpdate,
+  orderUpsert,
+  orders,
 };

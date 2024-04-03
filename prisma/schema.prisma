@@ -133,10 +133,10 @@ model Order {
   type        ORDER_TYPE   @default(TAKE_AWAY)
   status      ORDER_STATUS @default(DRAFT)
   notes       String?
-  table       Json?
+  table       Json         @default("{}")
   taxes       Json[]
   fees        Json[]
-  extra       Json
+  extra       Json         @default("{}")
   completedAt DateTime?
   deliveredAt DateTime?
   customer    User?        @relation("orders", fields: [customerId], references: [id])
@@ -151,6 +151,8 @@ model Order {
   storeId     String
   items       Item[]
   bill        Bill?
+
+  @@unique([shortId, storeId])
 }
 
 enum ORDER_TYPE {
@@ -170,32 +172,31 @@ enum ORDER_STATUS {
 }
 
 model Item {
-  id          String       @id @default(uuid())
-  title       String?
-  note        String?
-  type        PRODUCT_TYPE @default(NON_VEG)
-  price       Float        @default(0)
-  quantity    Int          @default(0)
-  total       Float        @default(0)
-  position    Int          @default(0)
-  placeAt     DateTime     @default(now())
-  placedAt    DateTime?
-  acceptedAt  DateTime?
-  prepared    DateTime?
-  status      ITEM_STATUS  @default(PLACED)
-  product     Product      @relation(fields: [productId], references: [id])
-  productId   String
-  order       Order?       @relation(fields: [orderId], references: [id])
-  orderId     String?
-  createdBy   User?        @relation("createdBy", fields: [createdId], references: [id])
-  createdId   String?
-  createdAt   DateTime     @default(now())
-  updatedBy   User?        @relation("updatedBy", fields: [updatedId], references: [id])
-  updatedId   String?
-  updatedAt   DateTime     @updatedAt
-  bill        Bill?        @relation(fields: [billId, billVersion], references: [shortId, version])
-  billId      String?
-  billVersion Int?
+  id         String       @id @default(uuid())
+  title      String?
+  note       String?
+  type       PRODUCT_TYPE @default(NON_VEG)
+  price      Float        @default(0)
+  quantity   Int          @default(0)
+  total      Float        @default(0)
+  position   Int          @default(0)
+  placeAt    DateTime     @default(now())
+  placedAt   DateTime?
+  acceptedAt DateTime?
+  prepared   DateTime?
+  status     ITEM_STATUS  @default(PLACED)
+  product    Product      @relation(fields: [productId], references: [id])
+  productId  String
+  order      Order?       @relation(fields: [orderId], references: [id])
+  orderId    String?
+  createdBy  User?        @relation("createdBy", fields: [createdId], references: [id])
+  createdId  String?
+  createdAt  DateTime     @default(now())
+  updatedBy  User?        @relation("updatedBy", fields: [updatedId], references: [id])
+  updatedId  String?
+  updatedAt  DateTime     @updatedAt
+  bill       Bill?        @relation(fields: [billId], references: [id])
+  billId     String?
 }
 
 enum ITEM_STATUS {
@@ -238,8 +239,7 @@ model Bill {
   createdAt  DateTime     @default(now())
   updatedAt  DateTime     @updatedAt
 
-  @@unique([orderId, version])
-  @@unique([shortId, version])
+  @@unique([storeId, shortId, version])
 }
 
 enum BILL_PAID_BY {

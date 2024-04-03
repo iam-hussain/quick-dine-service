@@ -1,4 +1,4 @@
-const inputTransform = ({ body, params }: any) => {
+const inputTransform = ({ body, params, query }: any) => {
   if (body?.price) {
     body.price = Number(body.price);
   }
@@ -28,6 +28,18 @@ const inputTransform = ({ body, params }: any) => {
       value: Number(e.value),
       position: Number(e.position),
     }));
+  }
+
+  if (query.today) {
+    query.today = query.today === "true";
+  }
+
+  if (query.skip) {
+    query.skip = Number(query.skip);
+  }
+
+  if (query.take) {
+    query.take = Number(query.take);
   }
 };
 export default inputTransform;

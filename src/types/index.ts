@@ -66,6 +66,7 @@ export type HTTPStatusName = keyof typeof StatusMap;
 
 export type JWT_OBJECT = {
   username: string;
+  id: string;
   store: string;
   type: "BUSINESS" | "PERSONAL";
 };
@@ -74,7 +75,7 @@ export type HandlerProps = {
   headers: Record<string, string | undefined>;
   token: {
     value: string | null;
-    decoded: false | JWT_OBJECT;
+    decoded: JWT_OBJECT;
     hasToken: Boolean;
     tokenType: "BUSINESS" | "PERSONAL" | "";
     isBusinessUser: Boolean;
