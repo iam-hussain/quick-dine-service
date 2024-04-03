@@ -201,12 +201,17 @@ const getMany = async ({
   const { today, skip = 0, take = 10, cursor = "" } = query;
   const props: any = {
     where: {
-      storeId: token.decoded.store,
-      take,
+      store: {
+        slug: token.decoded.store,
+      },
     },
+    take,
   };
   if (today) {
-    props.where.createdAt = { gte: dateTime.getTodayStart() };
+    props.where.createdAt = {
+      gte: dateTime.getTodayStart(),
+      lte: dateTime.getTodayEnd(),
+    };
   }
   if (cursor) {
     props.cursor = {
@@ -236,7 +241,9 @@ const getOne = async ({
   const order = await database.order.findUnique({
     where: {
       shortId: id,
-      storeId: token.decoded.store,
+      store: {
+        slug: token.decoded.store,
+      },
     },
   });
 

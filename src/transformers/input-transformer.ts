@@ -1,4 +1,5 @@
 const inputTransform = ({ body, params, query }: any) => {
+  console.log({ body });
   if (body?.price) {
     body.price = Number(body.price);
   }
