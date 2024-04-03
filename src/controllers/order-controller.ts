@@ -6,6 +6,7 @@ import dateTime from "../libs/date-time";
 import { $Enums, Item, Order, Prisma, PRODUCT_TYPE } from "@prisma/client";
 import storeAdditionalTransformer from "../transformers/store-additional-transformer";
 import idGenerator from "../libs/id-generator";
+import idSeries from "../libs/id-series";
 
 const getItems = (
   e: (typeof validators.orderUpsert.static.items)[0],
@@ -70,7 +71,7 @@ const getOrderData = (
 
   if (data?.fees && data.fees.length) {
     order.fees = data.fees
-      .map((e) => storeAdditionalTransformer.getFee(e))
+      .map((e) => storeAdditionalTransformer.getFee(e as any))
       .filter(Boolean);
   }
 
@@ -111,7 +112,9 @@ const upsert = async ({
     const fetchedOrder = await database.order.findUnique({
       where: {
         shortId,
-        storeId: token.decoded.store,
+        store: {
+          slug: token.decoded.store,
+        },
       },
       include: {
         items: {
@@ -142,11 +145,12 @@ const upsert = async ({
       },
     });
   } else {
+    const shortId = await idSeries.generateOrderId(token.decoded.store);
     await database.order.create({
       data: {
         ...getOrderData(body),
         createdAt: token.decoded.id,
-        shortId: idGenerator.generateShortID(),
+        shortId,
       },
     });
   }
@@ -231,7 +235,7 @@ const getOne = async ({
 
   const order = await database.order.findUnique({
     where: {
-      id,
+      shortId: id,
       storeId: token.decoded.store,
     },
   });

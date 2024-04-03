@@ -5,6 +5,7 @@ import categoryController from "../controllers/category-controller";
 import productController from "../controllers/product-controller";
 import { shouldBeBusinessUserStore } from "../providers/authorization";
 import inputTransform from "../transformers/input-transformer";
+import orderController from "../controllers/order-controller";
 
 export default new Elysia({
   name: "store_router",
@@ -56,6 +57,20 @@ export default new Elysia({
   })
   .delete("/product/:id", productController.deleteOne, {
     params: validators.id,
+    beforeHandle: shouldBeBusinessUserStore as never,
+    transform: inputTransform,
+  })
+  .post("/order", orderController.upsert, {
+    body: validators.orderUpsert,
+    beforeHandle: shouldBeBusinessUserStore as never,
+    transform: inputTransform,
+  })
+  .get("/order/:id", orderController.getOne, {
+    params: validators.id,
+    beforeHandle: shouldBeBusinessUserStore as never,
+    transform: inputTransform,
+  })
+  .get("/orders", orderController.getMany, {
     beforeHandle: shouldBeBusinessUserStore as never,
     transform: inputTransform,
   });

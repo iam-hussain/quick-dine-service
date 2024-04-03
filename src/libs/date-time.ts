@@ -21,6 +21,9 @@ export const getIDFormatDate = () => {
 export const getTodayStart = (date: string | Date = new Date()) => {
   return moment(date).startOf("day").utc().toDate();
 };
+export const getTodayEnd = (date: string | Date = new Date()) => {
+  return moment(date).endOf("day").utc().toDate();
+};
 
 export default {
   getDate,
@@ -28,4 +31,5 @@ export default {
   getDateTimeFormat,
   getIDFormatDate,
   getTodayStart,
+  getTodayEnd,
 };
