@@ -7,7 +7,6 @@ enum CalcValueType {
 }
 
 enum ORDER_TYPE {
-  PRE_DINING = "PRE_DINING",
   DINING = "DINING",
   TAKE_AWAY = "TAKE_AWAY",
   PICK_UP = "PICK_UP",
@@ -131,7 +130,7 @@ const orderUpsert = t.Object({
   notes: t.Optional(t.String()),
   customerId: t.Optional(t.String()),
   createdId: t.Optional(t.String()),
-  items: t.Array(items),
+  items: t.Optional(t.Array(items)),
   completedAt: t.Optional(t.String()),
   deliveredAt: t.Optional(t.String()),
   fees,
@@ -146,7 +145,7 @@ const storeAdditionalUpdate = t.Object({
 });
 
 const orders = t.Object({
-  today: t.Optional(t.Boolean()),
+  date: t.Optional(t.String()),
   skip: t.Optional(t.Integer()),
   take: t.Optional(t.Integer()),
   cursor: t.Optional(t.String()),
@@ -163,4 +162,5 @@ export default {
   storeAdditionalUpdate,
   orderUpsert,
   orders,
+  items,
 };

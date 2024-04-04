@@ -9,7 +9,7 @@ import idGenerator from "../libs/id-generator";
 import idSeries from "../libs/id-series";
 
 const getItems = (
-  e: (typeof validators.orderUpsert.static.items)[0],
+  e: typeof validators.items.static,
   orderId: string,
   userId: string
 ) => {
@@ -25,7 +25,11 @@ const getItems = (
     placeAt: dateTime.getDate(),
     placedAt: dateTime.getDate(),
     orderId: orderId,
-    createdId: userId,
+    createdBy: {
+      connect: {
+        id: userId,
+      },
+    },
   };
 };
 
@@ -45,13 +49,13 @@ const getOrderData = (
 
   if (data?.table) {
     order.table = data.table;
-  } else if (!data.table && returnDefault) {
+  } else if (!data?.table && returnDefault) {
     order.table = "";
   }
 
   if (data?.notes) {
     order.notes = data.notes;
-  } else if (!data.notes && returnDefault) {
+  } else if (!data?.notes && returnDefault) {
     order.notes = "";
   }
 
@@ -103,8 +107,8 @@ const upsert = async ({
   if (typeof token.decoded === "boolean") {
     throw new AuthenticationError("INVALID_TOKEN");
   }
-  const { shortId, items } = body;
-  let order: FetchedOrder = null;
+  const { shortId, items = [] } = body;
+  let order: any = null;
   const disconnect: ItemId[] = [];
   const createItems: typeof validators.orderUpsert.static.items = [];
 
@@ -128,7 +132,6 @@ const upsert = async ({
       set.status = "Precondition Failed";
       throw new CustomError("INVALID_INPUT");
     }
-    order = fetchedOrder;
     fetchedOrder.items
       .filter((e) => Boolean(e.id))
       .filter((e) => !items.includes(e.id as any))
@@ -137,7 +140,7 @@ const upsert = async ({
           id: e.id,
         });
       });
-    await database.order.update({
+    order = await database.order.update({
       where: { shortId },
       data: {
         ...getOrderData(body),
@@ -146,13 +149,32 @@ const upsert = async ({
     });
   } else {
     const shortId = await idSeries.generateOrderId(token.decoded.store);
-    await database.order.create({
+    order = await database.order.create({
       data: {
         ...getOrderData(body),
-        createdAt: token.decoded.id,
+        createdBy: {
+          connect: {
+            id: token.decoded.id,
+          },
+        },
         shortId,
+        store: {
+          connect: {
+            slug: token.decoded.store,
+          },
+        },
+      },
+      include: {
+        items: {
+          select: {
+            id: true,
+          },
+        },
       },
     });
+    if (order) {
+      idSeries.incrementOrderId(token.decoded.store);
+    }
   }
 
   if (!order) {
@@ -189,6 +211,8 @@ const upsert = async ({
       },
     });
   }
+
+  return order;
 };
 
 const getMany = async ({
@@ -198,7 +222,7 @@ const getMany = async ({
   if (typeof token.decoded === "boolean") {
     throw new AuthenticationError("INVALID_TOKEN");
   }
-  const { today, skip = 0, take = 10, cursor = "" } = query;
+  const { date, skip = 0, take = 10, cursor = "" } = query;
   const props: any = {
     where: {
       store: {
@@ -206,12 +230,18 @@ const getMany = async ({
       },
     },
     take,
+    orderBy: {
+      shortId: "desc",
+    },
   };
-  if (today) {
-    props.where.createdAt = {
-      gte: dateTime.getTodayStart(),
-      lte: dateTime.getTodayEnd(),
+  if (date) {
+    props.where.shortId = {
+      contain: date,
     };
+    // props.where.createdAt = {
+    //   gte: dateTime.getTodayStart(),
+    //   lte: dateTime.getTodayEnd(),
+    // };
   }
   if (cursor) {
     props.cursor = {

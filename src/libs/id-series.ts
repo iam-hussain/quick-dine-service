@@ -10,34 +10,46 @@ const getPadded = (value: number) => {
 const generateOrderId = async (storeSlug: string) => {
   const cached = cache.getKey(storeSlug);
   const current = dateTime.getIDFormatDate();
-  if (!cached) {
+  if (cached) {
     const { count, date } = cached;
+
     if (current === date) {
-      cache.setKey(storeSlug, { count: count + 1, date });
       return `${date}-${getPadded(count + 1)}`;
     } else {
-      cache.setKey(storeSlug, { count: 1, date: current });
       return `${date}-${getPadded(count + 1)}`;
     }
   } else {
-    console.log("I am fetching");
-    const count = await database.order.count({
+    const lastEntry = await database.order.findFirst({
       where: {
-        createdAt: {
-          gte: dateTime.getTodayStart(),
-          lte: dateTime.getTodayEnd(),
+        shortId: {
+          contains: dateTime.getIDFormatDate(),
         },
         store: {
           slug: storeSlug,
         },
       },
+      select: {
+        shortId: true,
+      },
+      orderBy: {
+        shortId: "desc",
+      },
     });
-
-    cache.setKey(storeSlug, { count: count + 1, date: current });
+    console.log("I am ed", { lastEntry });
+    const [_, id] = (lastEntry?.shortId || "").split("-");
+    const count = Number(id) || 0;
+    cache.setKey(storeSlug, { count, date: current });
     return `${current}-${getPadded(count + 1)}`;
   }
 };
 
+const incrementOrderId = (storeSlug: string) => {
+  const current = dateTime.getIDFormatDate();
+  const cached = cache.getKey(storeSlug);
+  cache.setKey(storeSlug, { count: cached.count + 1, date: current });
+};
+
 export default {
   generateOrderId,
+  incrementOrderId,
 };
