@@ -1,6 +1,6 @@
 import { t } from "elysia";
 
-enum CalcValueType {
+enum CALC_VALUE_TYPE {
   VALUE = "VALUE",
   PERCENTAGE = "PERCENTAGE",
   VALUE_COUNT = "VALUE_COUNT",
@@ -92,7 +92,7 @@ const fees = t.Optional(
         rate: t.Number(),
         printName: t.Optional(t.String()),
         position: t.Optional(t.Integer()),
-        type: t.Optional(t.Enum(CalcValueType)),
+        type: t.Optional(t.Enum(CALC_VALUE_TYPE)),
       })
     )
   )
@@ -117,7 +117,7 @@ const taxes = t.Optional(
         rate: t.Number(),
         printName: t.Optional(t.String()),
         position: t.Optional(t.Integer()),
-        type: t.Optional(t.Enum(CalcValueType)),
+        type: t.Optional(t.Enum(CALC_VALUE_TYPE)),
       })
     )
   )
@@ -127,9 +127,9 @@ const orderUpsert = t.Object({
   shortId: t.Optional(t.String()),
   type: t.Optional(t.Enum(ORDER_TYPE)),
   status: t.Optional(t.Enum(ORDER_STATUS)),
-  notes: t.Optional(t.String()),
+  note: t.Optional(t.String()),
   customerId: t.Optional(t.String()),
-  createdId: t.Optional(t.String()),
+  // createdId: t.Optional(t.String()),
   items: t.Optional(t.Array(items)),
   completedAt: t.Optional(t.String()),
   deliveredAt: t.Optional(t.String()),

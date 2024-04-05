@@ -132,7 +132,7 @@ model Order {
   shortId     String       @unique
   type        ORDER_TYPE   @default(TAKE_AWAY)
   status      ORDER_STATUS @default(DRAFT)
-  notes       String?
+  note        String?
   table       Json         @default("{}")
   taxes       Json[]
   fees        Json[]
@@ -212,7 +212,7 @@ model Bill {
   shortId    String
   version    Int          @default(0)
   type       ORDER_TYPE   @default(TAKE_AWAY)
-  notes      String?
+  note       String?
   table      Json?
   taxes      Json[]
   fees       Json[]

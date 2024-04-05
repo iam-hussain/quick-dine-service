@@ -94,7 +94,7 @@ export type HandlerProps = {
   };
 };
 
-type CalcValueType = "VALUE" | "PERCENTAGE" | "VALUE_COUNT";
+type CALC_VALUE_TYPE = "VALUE" | "PERCENTAGE" | "VALUE_COUNT";
 
 export type StoreAdditionalType = {
   table: {
@@ -109,21 +109,21 @@ export type StoreAdditionalType = {
     printName: string;
     value: number;
     position: number;
-    type: CalcValueType;
+    type: CALC_VALUE_TYPE;
   }[];
   discounts: {
     key: string;
     name: string;
     printName: string;
     value: number;
-    type: CalcValueType;
+    type: CALC_VALUE_TYPE;
   }[];
   packing: {
     value: number;
-    type: CalcValueType;
+    type: CALC_VALUE_TYPE;
   };
   delivery: {
     value: number;
-    type: CalcValueType;
+    type: CALC_VALUE_TYPE;
   };
 };

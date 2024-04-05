@@ -53,10 +53,10 @@ const getOrderData = (
     order.table = "";
   }
 
-  if (data?.notes) {
-    order.notes = data.notes;
-  } else if (!data?.notes && returnDefault) {
-    order.notes = "";
+  if (data?.note) {
+    order.note = data.note;
+  } else if (!data?.note && returnDefault) {
+    order.note = "";
   }
 
   if (data?.completedAt) {
