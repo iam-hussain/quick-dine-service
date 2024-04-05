@@ -149,6 +149,10 @@ const orders = t.Object({
   skip: t.Optional(t.Integer()),
   take: t.Optional(t.Integer()),
   cursor: t.Optional(t.String()),
+  type: t.Optional(t.Enum(ORDER_TYPE)),
+  status: t.Optional(t.Enum(ORDER_STATUS)),
+  types: t.Optional(t.Array(t.Enum(ORDER_TYPE))),
+  statuses: t.Optional(t.Array(t.Enum(ORDER_STATUS))),
 });
 
 export default {

@@ -222,7 +222,16 @@ const getMany = async ({
   if (typeof token.decoded === "boolean") {
     throw new AuthenticationError("INVALID_TOKEN");
   }
-  const { date, skip = 0, take = 10, cursor = "" } = query;
+  const {
+    date,
+    skip = 0,
+    take = 10,
+    cursor = "",
+    type,
+    status,
+    types,
+    statuses,
+  } = query;
   const props: any = {
     where: {
       store: {
@@ -232,6 +241,9 @@ const getMany = async ({
     take,
     orderBy: {
       shortId: "desc",
+    },
+    include: {
+      items: true,
     },
   };
   if (date) {
@@ -251,6 +263,23 @@ const getMany = async ({
   } else {
     props.skip = skip;
   }
+
+  if (type) {
+    props.where.type = type;
+  }
+
+  if (status) {
+    props.where.status = status;
+  }
+
+  if (types && types.length) {
+    props.where.type = { in: types };
+  }
+
+  if (statuses && statuses.length) {
+    props.where.status = { in: statuses };
+  }
+
   const order = await database.order.findMany(props);
 
   return order || [];
@@ -274,6 +303,9 @@ const getOne = async ({
       store: {
         slug: token.decoded.store,
       },
+    },
+    include: {
+      items: true,
     },
   });
 
