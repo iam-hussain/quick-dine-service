@@ -132,16 +132,16 @@ const upsert = async ({
       set.status = "Precondition Failed";
       throw new CustomError("INVALID_INPUT");
     }
-    fetchedOrder.items
-      .filter((e) => Boolean(e.id))
-      .filter((e) => !items.includes(e.id as any))
-      .forEach((e) => {
-        disconnect.push({
-          id: e.id,
-        });
-      });
+    // fetchedOrder.items
+    //   .filter((e) => Boolean(e.id))
+    //   .filter((e) => !items.includes(e.id as any))
+    //   .forEach((e) => {
+    //     disconnect.push({
+    //       id: e.id,
+    //     });
+    //   });
     order = await database.order.update({
-      where: { shortId },
+      where: { shortId: fetchedOrder.shortId },
       data: {
         ...getOrderData(body),
         updatedId: token.decoded.id,
