@@ -98,14 +98,12 @@ const fees = t.Optional(
   )
 );
 
-const table = t.Optional(
-  t.Object({
-    key: t.String(),
-    name: t.String(),
-    printName: t.Optional(t.String()),
-    position: t.Optional(t.Integer()),
-  })
-);
+const table = t.Object({
+  key: t.String(),
+  name: t.String(),
+  printName: t.Optional(t.String()),
+  position: t.Optional(t.Integer()),
+});
 
 const tables = t.Optional(t.Array(table));
 const taxes = t.Optional(
@@ -134,7 +132,13 @@ const orderUpsert = t.Object({
   completedAt: t.Optional(t.String()),
   deliveredAt: t.Optional(t.String()),
   fees,
-  table,
+  table: t.Object({
+    key: t.Optional(t.String()),
+    name: t.Optional(t.String()),
+    printName: t.Optional(t.String()),
+    position: t.Optional(t.Integer()),
+  }),
+
   taxes,
 });
 

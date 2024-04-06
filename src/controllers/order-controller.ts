@@ -25,11 +25,12 @@ const getItems = (
     placeAt: dateTime.getDate(),
     placedAt: dateTime.getDate(),
     orderId: orderId,
-    createdBy: {
-      connect: {
-        id: userId,
-      },
-    },
+    createdId: userId,
+    // createdBy: {
+    //   connect: {
+    //     id: userId,
+    //   },
+    // },
   };
 };
 
